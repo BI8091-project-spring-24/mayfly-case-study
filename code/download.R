@@ -1,10 +1,10 @@
-#########################################################
+################################################################################
 
-# Download ---------------------------------------------
+# Download file
 
-#########################################################
+################################################################################
 
-# Connect to GBIF --------------------------------------
+# Connect to GBIF --------------------------------------------------------------
 
 # Need a GBIF account
 # Setting username, password and email in my .Renviron. 
@@ -13,7 +13,7 @@ usethis::edit_r_environ()
 # GBIF_PWD="my password"
 # GBIF_EMAIL="my email"
 
-# Create download request -----------------------------------------
+# Create download request ------------------------------------------------------
 
 # Find taxonkey - get list of gbif keys to filter download
 species_names <- c("Baetis rhodani (Pictet, 1843)")
@@ -33,6 +33,8 @@ download_key <- occ_download(
 
 # Check progress
 occ_download_wait(download_key)
+
+# Import and save --------------------------------------------------------------
 
 # Import
 insectdata <- occ_download_get(download_key) %>%
