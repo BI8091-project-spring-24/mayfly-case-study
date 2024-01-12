@@ -4,11 +4,9 @@ format: html
 editor: visual
 ---
 
-# Info
+## Info
 
 Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
-
-# Analysis 
 
 ## Setup
 
@@ -23,14 +21,14 @@ install.load.package <- function(x) {
   require(x, character.only = TRUE)
 }
 
-package_vec <- c("here","dplyr","knitr","ggplot2") # specify package
+package_vec <- c("here","dplyr","knitr","ggplot2","rgbif") # specify package
 
 ## executing install & load for each package
 sapply(package_vec, install.load.package)
 
 ```
 
-Download Baetis rhodani occurrence data from GBIF. Download criteria:
+Download Baetis rhodani occurrence data from GBIF. Example can be found here "https://data-blog.gbif.org/post/downloading-long-species-lists-on-gbif/". Download criteria:
 
 -   Species: Baetis rhodani
 
@@ -45,4 +43,31 @@ Download Baetis rhodani occurrence data from GBIF. Download criteria:
 source(here::here("code","download.R"))
 
 
+```
+
+## Data cleaning
+
+```{r}
+
+```
+
+## Data exploration
+
+```{r}
+
+```
+
+## Analysis
+
+```{r}
+
+```
+
+## Citations 
+
+Citing R and packages used, including package version.
+
+```{r}
+# Citing all packages used, including the package versions.
+report::cite_packages()
 ```
