@@ -31,13 +31,12 @@ download_key <- occ_download(
   pred("hasCoordinate", TRUE), 
   format = "DWCA") # Download as a Darwin Core Archive file
 
-# Check the progress, get string for checking status
-download_key
+# Check progress
+occ_download_wait(download_key)
 
-# Import and save dataset ------------------------------------------
+# Import
+insectdata <- occ_download_get(download_key) %>%
+  occ_download_import()
 
-res_meta <- occ_download_wait(download_key, status_ping = 5, curlopts = list(), quiet = FALSE)
-## 2. Download the data as .zip (can specify a path)
-res_get <- occ_download_get(res)
-## 3. Load the data into R
-res_data <- occ_download_import(res_get)
+# Save file
+save(insectdata, file = here::here("data","source_data","insectdata.rda"))

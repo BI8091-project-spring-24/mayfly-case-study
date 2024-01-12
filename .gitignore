@@ -50,3 +50,6 @@ rsconnect/
 
 # csv files
 *.csv
+
+# zip-files
+*.zip
