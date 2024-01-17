@@ -63,7 +63,7 @@ insectdata_coords <- insectdata[coord_flags$.summary, ]
 ## 2.3. Remove records with temporal outliers ----
 
 # Test for temporal outliers on taxon level
-time_flags <- cf_age(x = insectdata_no_flags,
+time_flags <- cf_age(x = insectdata_coords,
                   lon = "decimalLongitude",
                   lat = "decimalLatitude",
                   taxon = "species", 
@@ -112,6 +112,13 @@ nrow(insectdata_low_uncertainty)#23516 (removed 31 records - not so bad)
 
 ## 3.2. Data sources ----
 
+# Check basis of record in df
+table(insectdata_low_uncertainty$basisOfRecord)
 
+# Check individual counts (to remove absences, where individual count = 0)
+table(insectdata_low_uncertainty$individualCount)
 
+# Remove records with more than 10 000 individuals counted
+insectdata_cleaned_count <- insectdata_low_uncertainty |>
+  filter(individualCount < 10000 | is.na(individualCount))
 
