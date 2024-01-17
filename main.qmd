@@ -1,33 +1,77 @@
-################################################################################
+---
+title: "main document"
+format: html
+editor: visual
+---
 
-# GBIF Data Cleaning 
+## Info
 
-################################################################################
+This file documents the different steps in the mayfly case study, created for the course Advanced biology BI8091 spring 2024.
 
-# 0. PACKAGES ----
-library(here)
-library(ggplot2)
-library(CoordinateCleaner)
-library(dplyr)
-library(terra)
-library(sf)
-here()
-# 1. LOAD DATA ----
+## Setup
 
-## 1.1. Download records from Box ----
+Setup: Load needed packages, and download data.
 
-# Add download link ----
+```{r setup}
+#| output: false
+
+## Custom install & load function
+install.load.package <- function(x) {
+  if (!require(x, character.only = TRUE)) {
+    install.packages(x, repos = "http://cran.us.r-project.org")
+  }
+  require(x, character.only = TRUE)
+}
+
+package_vec <- c("here","dplyr","knitr",
+                 "ggplot2","rgbif",
+                 "here", "CoordinateCleaner",
+                 "terra", "sf") # specify package
+
+## executing install & load for each package
+sapply(package_vec, install.load.package)
+
+```
+
+The example data in this case is *Baetis rhodani* occurrence data from GBIF. Example on how to download can be found here: "https://data-blog.gbif.org/post/downloading-long-species-lists-on-gbif/". Download criteria:
+
+-   Species: Baetis rhodani
+
+-   Geographic area: Norway
+
+-   Basis of record: Everything
+
+-   Year range: 1950-current
+
+```{r load_data}
+#| output: true
+#| error: true
+
+# Load script
+# this doesn't work for me: (A)
+#  source(here::here("code","download.R"))
+
+#### Loading already downloaded data (TEMPORARY SOLUTION) -------------------
+
+# data URL
 mayfly_records <- "https://ntnu.box.com/shared/static/oky8o2cha6nek1jjexum29qqh0fk7asm.rda"
 
 # Download file (NB: requires you to make "data" directory beforehand)
-download.file(mayfly_records, here("data", "insectdata.rda"))
+#download.file(mayfly_records, here("data", "insectdata.rda"))
 
-## 1.2. Load data ----
+## Load data
 load(here("data", "insectdata.rda"))
 
-# 2. CLEAN GBIF RECORDS ----
+```
 
-## 2.1. Inspect data ----
+## Data cleaning
+
+### 1. Remove flagged coordinate and time records
+
+First, plot the raw coordinates to get an overview of the data:
+
+```{r plot_data}
+#| trunca: true
 
 # Download world map 
 wm <- borders("world", colour = "gray50", fill = "gray50")
@@ -42,6 +86,13 @@ ggplot() +
              size = 0.5) +
   theme_classic()
 
+
+
+```
+
+Then, remove records with problematic coordinates and plot the flagged records.
+
+```{r clean_coords}
 ## 2.2. Remove records with problematic coordinates ----
 
 # Extract coordinate flags
@@ -59,9 +110,11 @@ plot(coord_flags, lon = "decimalLongitude", lat = "decimalLatitude")
 
 # Exclude flagged records
 insectdata_coords <- insectdata[coord_flags$.summary, ]
+```
 
-## 2.3. Remove records with temporal outliers ----
+Finally, we test for temporal outliers on the taxon level, and remove the records:
 
+```{r clean_time}
 # Test for temporal outliers on taxon level
 time_flags <- cf_age(x = insectdata_coords,
                   lon = "decimalLongitude",
@@ -72,19 +125,26 @@ time_flags <- cf_age(x = insectdata_coords,
                   value = "flagged") # Flagged 8 records
 
 # Exclude records flagged for temporal outliers
-insectdata_no_flags <- insectdata_coords[time_flags, ]  
+insectdata_no_flags <- insectdata_coords[time_flags, ] 
+```
 
-# 3. IMPROVE DATA QUALITY WITH META-DATA ----
+### 2. Use metadata to improve data quality
 
-## 3.1. Coordinate precision ----
+To improve the precision and our confidence in the data further, we can use the metadata included in the dataset.
 
+First, we make a boxplot of the coordinate precisions reported for the insect data:
+
+```{r coord_boxplot}
 # Boxplot of coordinate precision in insect data
 ggplot(insectdata_no_flags, aes(x = coordinateUncertaintyInMeters)) +
   geom_boxplot(bins = 30, na.rm = TRUE) +
   labs(x = "Coordinate Uncertainty (m)", y = "Frequency") +
   theme_minimal() # A few records with relatively high coordinate uncertainty
+```
 
-# Summary stats on coordinate uncertainty
+Then, we calculate some summary stats for the coordinate uncertainties, make a table of each value's frequency, and inspect it:
+
+```{r coord_summary}
 mean(insectdata_no_flags$coordinateUncertaintyInMeters,
      na.rm = TRUE) #385.518
 min(insectdata_no_flags$coordinateUncertaintyInMeters,
@@ -94,12 +154,17 @@ max(insectdata_no_flags$coordinateUncertaintyInMeters,
 
 # Table of frequency of each value of Coordinate Uncertainty
 value_counts <- table(insectdata_no_flags$coordinateUncertaintyInMeters)
-View(value_counts)
+rmarkdown::paged_table(data.frame(value_counts))
 
 # Which Coordinate uncertainty value is most common?
 sorted_value_counts <- sort(value_counts, decreasing = TRUE)
 most_frequent_value <- names(sorted_value_counts)[1]
 most_frequent_value #1m coordinate uncertainty most frequent
+```
+
+Then, remove records with coordinate uncertainty \>3km and records with NA for coordinate uncertainty:
+
+```{r}
 
 # Remove records with coordinate uncertainty >3km and records with NA for coordinate uncertainty
 insectdata_low_uncertainty <- insectdata_no_flags |>
@@ -110,38 +175,21 @@ insectdata_low_uncertainty <- insectdata_no_flags |>
 nrow(insectdata_no_flags) #23547
 nrow(insectdata_low_uncertainty)#23516 (removed 31 records - not so bad)
 
-## 3.2. Data sources ----
+```
 
-# Check basis of record in df
-table(insectdata_low_uncertainty$basisOfRecord)
+## Data exploration
 
-# Check individual counts (to remove absences, where individual count = 0)
-table(insectdata_low_uncertainty$individualCount)
+## Analysis
 
-# Remove records with more than 10 000 individuals counted
-insectdata_cleaned_count <- insectdata_low_uncertainty |>
-  filter(individualCount < 10000 | is.na(individualCount))
+```{r}
 
-# Check family
-table(insectdata_cleaned_count$family) #Baetidae 23480
+```
 
-# Check taxonRank
-table(insectdata_cleaned_count$taxonRank) #Species: 23463, Unranked: 17
+## Citations
 
-## 3.3. REMOVE PROBLEMATIC DATASETS ----
+Citing R and packages used, including package version.
 
-# Identify datasets with ddmm to dd.dd conversion error 
-out.ddmm <- cd_ddmm(insectdata_cleaned_count, lon = "decimalLongitude", lat = "decimalLatitude", 
-                    ds = "species", diagnostic = T, diff = 1,
-                    value = "dataset") # 0 records flagged
-
-#Test for rasterized sampling
-par(mfrow = c(2,2), mar = rep(2, 4))
-out.round <- cd_round(insectdata_cleaned_count, lon = "decimalLongitude", 
-                      lat = "decimalLatitude", 
-                      ds = "species",
-                      value = "dataset",
-                      T1 = 7,
-                      graphs = T) #it looks like there is a bit of rasterized sampling so we will need to account for this
-
-
+```{r}
+# Citing all packages used, including the package versions.
+report::cite_packages()
+```
