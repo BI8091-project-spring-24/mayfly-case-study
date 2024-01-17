@@ -127,3 +127,21 @@ table(insectdata_cleaned_count$family) #Baetidae 23480
 
 # Check taxonRank
 table(insectdata_cleaned_count$taxonRank) #Species: 23463, Unranked: 17
+
+## 3.3. REMOVE PROBLEMATIC DATASETS ----
+
+# Identify datasets with ddmm to dd.dd conversion error 
+out.ddmm <- cd_ddmm(insectdata_cleaned_count, lon = "decimalLongitude", lat = "decimalLatitude", 
+                    ds = "species", diagnostic = T, diff = 1,
+                    value = "dataset") # 0 records flagged
+
+#Test for rasterized sampling
+par(mfrow = c(2,2), mar = rep(2, 4))
+out.round <- cd_round(insectdata_cleaned_count, lon = "decimalLongitude", 
+                      lat = "decimalLatitude", 
+                      ds = "species",
+                      value = "dataset",
+                      T1 = 7,
+                      graphs = T) #it looks like there is a bit of rasterized sampling so we will need to account for this
+
+
