@@ -78,7 +78,7 @@ insectdata_no_flags <- insectdata_coords[time_flags, ]
 
 ## 3.1. Coordinate precision ----
 
-# Histogram of coordinate precision in insect data
+# Boxplot of coordinate precision in insect data
 ggplot(insectdata_no_flags, aes(x = coordinateUncertaintyInMeters)) +
   geom_boxplot(bins = 30, na.rm = TRUE) +
   labs(x = "Coordinate Uncertainty (m)", y = "Frequency") +
@@ -110,8 +110,7 @@ insectdata_low_uncertainty <- insectdata_no_flags |>
 nrow(insectdata_no_flags) #23547
 nrow(insectdata_low_uncertainty)#23516 (removed 31 records - not so bad)
 
-
-
+## 3.2. Data sources ----
 
 
 
