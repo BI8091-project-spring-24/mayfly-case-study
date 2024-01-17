@@ -122,3 +122,8 @@ table(insectdata_low_uncertainty$individualCount)
 insectdata_cleaned_count <- insectdata_low_uncertainty |>
   filter(individualCount < 10000 | is.na(individualCount))
 
+# Check family
+table(insectdata_cleaned_count$family) #Baetidae 23480
+
+# Check taxonRank
+table(insectdata_cleaned_count$taxonRank) #Species: 23463, Unranked: 17
