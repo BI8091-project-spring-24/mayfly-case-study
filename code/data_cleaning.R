@@ -52,7 +52,10 @@ coordinate_flags <- clean_coordinates(x = insectdata,
                                       test = c("centroids", "equal", "gbif", "zeros"))
 
 # Get a summary of the detected flags
-summary(coordinate_flags)
+summary(coordinate_flags) # only 3 records flagged (centroids)
 
 # Plot flagged records
 plot(coordinate_flags, lon = "decimalLongitude", lat = "decimalLatitude")
+
+# Exclude flagged records
+insectdata_no_flags <- insectdata[coordinate_flags$.summary, ]
