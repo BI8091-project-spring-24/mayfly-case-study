@@ -78,11 +78,37 @@ insectdata_no_flags <- insectdata_coords[time_flags, ]
 
 ## 3.1. Coordinate precision ----
 
+# Histogram of coordinate precision in insect data
+ggplot(insectdata_no_flags, aes(x = coordinateUncertaintyInMeters)) +
+  geom_boxplot(bins = 30, na.rm = TRUE) +
+  labs(x = "Coordinate Uncertainty (m)", y = "Frequency") +
+  theme_minimal() # A few records with relatively high coordinate uncertainty
 
+# Summary stats on coordinate uncertainty
+mean(insectdata_no_flags$coordinateUncertaintyInMeters,
+     na.rm = TRUE) #385.518
+min(insectdata_no_flags$coordinateUncertaintyInMeters,
+    na.rm = TRUE) #0.05
+max(insectdata_no_flags$coordinateUncertaintyInMeters,
+    na.rm = TRUE) #79110
 
+# Table of frequency of each value of Coordinate Uncertainty
+value_counts <- table(insectdata_no_flags$coordinateUncertaintyInMeters)
+View(value_counts)
 
+# Which Coordinate uncertainty value is most common?
+sorted_value_counts <- sort(value_counts, decreasing = TRUE)
+most_frequent_value <- names(sorted_value_counts)[1]
+most_frequent_value #1m coordinate uncertainty most frequent
 
+# Remove records with coordinate uncertainty >3km and records with NA for coordinate uncertainty
+insectdata_low_uncertainty <- insectdata_no_flags |>
+  filter(coordinateUncertaintyInMeters <= 3000 | 
+           is.na(coordinateUncertaintyInMeters))
 
+# Check how many records are left
+nrow(insectdata_no_flags) #23547
+nrow(insectdata_low_uncertainty)#23516 (removed 31 records - not so bad)
 
 
 
