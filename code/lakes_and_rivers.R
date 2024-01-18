@@ -1,13 +1,14 @@
 # Lake and river data
 
-# Lake data
-## Data from NVE: innsjødatabase
-#innsjo_sf <- geojsonsf::geojson_sf(here::here("data","source_data","NVE_innsjo","NVEData","Innsjo_Innsjo.geojson"))
+## Dataset "Elvenett, hovedelv" from NVE
+hovedelv_sf  <- sf::read_sf("https://ntnu.box.com/shared/static/09y8k4t2svbkpimm5fhebe0u4nf5od9e.geojson")
 
 # Change to projected coordinates
-#innsjo_sf_P <- sf::st_transform(innsjo_sf, 32633)
+hovedelv_sf_P <- sf::st_transform(hovedelv_sf, 32633) # N33
 
 
-## Dataset "Elvenett, hovedelv" from NVE
-Hovedelv_sf  <- sf::read_sf("https://app.box.com/index.php?rm=box_download_shared_file&shared_name=ihnd17x16lwwqpsphix9ehuuj8sw4o6t&file_id=f_799286199957")
+## Dataset Norwegian lakes
+innsjo_sf  <- sf::read_sf("https://ntnu.box.com/shared/static/dvv6w3bu1o3gdgga0ucl45ry5sofrv8g.geojson")
 
+# Change to projected coordinates
+innsjo_sf_P <- sf::st_transform(innsjo_sf, 32633) # N33
