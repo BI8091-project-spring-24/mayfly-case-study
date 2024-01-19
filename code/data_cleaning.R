@@ -101,14 +101,14 @@ sorted_value_counts <- sort(value_counts, decreasing = TRUE)
 most_frequent_value <- names(sorted_value_counts)[1]
 most_frequent_value #1m coordinate uncertainty most frequent
 
-# Remove records with coordinate uncertainty >3km and records with NA for coordinate uncertainty
+# Remove records with coordinate uncertainty >1km and records with NA for coordinate uncertainty
 insectdata_low_uncertainty <- insectdata_no_flags |>
-  filter(coordinateUncertaintyInMeters <= 3000 | 
+  filter(coordinateUncertaintyInMeters <= 1000 | 
            is.na(coordinateUncertaintyInMeters))
 
 # Check how many records are left
 nrow(insectdata_no_flags) #23547
-nrow(insectdata_low_uncertainty)#23516 (removed 31 records - not so bad)
+nrow(insectdata_low_uncertainty)#23487 (removed 60 records - not so bad)
 
 ## 3.2. Data sources ----
 
@@ -118,15 +118,21 @@ table(insectdata_low_uncertainty$basisOfRecord)
 # Check individual counts (to remove absences, where individual count = 0)
 table(insectdata_low_uncertainty$individualCount)
 
-# Remove records with more than 10 000 individuals counted
+# Remove records with more than 10 000 individuals counted and with basis of record = material sample
 insectdata_cleaned_count <- insectdata_low_uncertainty |>
-  filter(individualCount < 10000 | is.na(individualCount))
+  filter(individualCount < 10000 | is.na(individualCount)) |>
+  filter(basisOfRecord != "MATERIAL SAMPLE")
 
 # Check family
-table(insectdata_cleaned_count$family) #Baetidae 23480
+table(insectdata_cleaned_count$family) #Baetidae 23451
 
 # Check taxonRank
-table(insectdata_cleaned_count$taxonRank) #Species: 23463, Unranked: 17
+table(insectdata_cleaned_count$taxonRank) #Species: 23434, Unranked: 17
+
+# Remove records with taxonomic rank = Unranked
+insectdata_cleaned_count <- insectdata_cleaned_count |>
+  filter(taxonRank == "UNRANKED")
+
 
 ## 3.3. REMOVE PROBLEMATIC DATASETS ----
 
@@ -144,4 +150,7 @@ out.round <- cd_round(insectdata_cleaned_count, lon = "decimalLongitude",
                       T1 = 7,
                       graphs = T) #it looks like there is a bit of rasterized sampling so we will need to account for this
 
+# Save cleaned df
+cleaned_insectdata <- insectdata_cleaned_count
+save(cleaned_insectdata, file = here("data", "cleaned_insectdata.rda"))
 
