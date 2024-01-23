@@ -131,7 +131,7 @@ table(insectdata_cleaned_count$taxonRank) #Species: 23434, Unranked: 17
 
 # Remove records with taxonomic rank = Unranked
 insectdata_cleaned_count <- insectdata_cleaned_count |>
-  filter(taxonRank == "UNRANKED")
+  filter(!taxonRank == "UNRANKED")
 
 
 ## 3.3. REMOVE PROBLEMATIC DATASETS ----
