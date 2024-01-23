@@ -6,11 +6,6 @@
 
 # Mapping datapints against lakes and rivers 
 
-# 0. Load packages
-library(mapview)
-
-
-
 # 1. Load lake and river data --------------------------------------------------
 
 ## Dataset "Elvenett, hovedelv" from NVE, covering all of Norway including Svalbard
@@ -76,8 +71,31 @@ mapview(insectdata_locations_sf_P, col.regions = "red") + mapview(hovedelv_sf_P,
 
 # Spatial filtering ------------------------------------------------------------
 
+# Keep only locations within 50 meters from rivers
+
+# Create 50 m buffer
+hovedelv_buf_50m <- sf::st_buffer(hovedelv_sf_P,50) 
+# Store as a geopackage file for later use (done once)
+hovedelv_buf_50m %>%
+  st_write(here::here("data","derived_data","hovedelv_buf_50m.gpkg"))
+
+hovedelv_buf_50m <- st_read(here::here("data","derived_data","hovedelv_buf_50m.gpkg"))
+
+# Filter
+# Join invertebrate datapoints with info from the lake/buffer they overlap with
+insectdata_buf50m <-  st_join(insectdata_locations_sf_P,hovedelv_buf_50m, join = st_intersects, largest = TRUE) 
+# largest = TRUE makes sure no extra rows with NAs are added to the dataframe
+
+# Keep only invertebrate datapoints which lay within the lake/buffer. They have the polygon info added
+insectdata_buf50m  <- insectdata_buf50m[hovedelv_buf_50m, , op = st_intersects] 
+# filter, get 10 191 observations (from 288 276 observations)
+
+# Save as a rda file
+save(insectdata_buf50m, file= here::here("data","derived_data","insectdata_buf50m.rda"))
 
 
+# View the 3000 locataions with insectdata which lie in or within 50 meters from a river.
+mapview(insectdata_buf50m) # 3313 points
 
 
 
