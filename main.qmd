@@ -179,6 +179,37 @@ nrow(insectdata_low_uncertainty)#23516 (removed 31 records - not so bad)
 
 ## Data exploration
 
+Mijødirektoratet and NINA are both missing information on sampling protocol:
+
+```{r}
+only_mdir <- insectdata_low_uncertainty |> filter(institutionCode == "miljodir")
+as.data.frame(table(only_mdir$samplingProtocol))
+
+only_nina <- insectdata_low_uncertainty |> filter(institutionCode == "NINA")
+as.data.frame(table(only_nina$samplingProtocol))
+
+```
+
+Plot the NINA and Mdir data:
+
+```{r}
+ggplot() +
+  coord_fixed() +
+  geom_point(data = only_mdir,
+             aes(x = decimalLongitude, y = decimalLatitude),
+             colour = "darkred",
+             size = 0.5) +
+  theme_classic()
+
+ggplot() +
+  coord_fixed() +
+  geom_point(data = only_nina,
+             aes(x = decimalLongitude, y = decimalLatitude),
+             colour = "darkred",
+             size = 0.5) +
+  theme_classic()
+```
+
 ## Analysis
 
 ```{r}
