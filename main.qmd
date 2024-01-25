@@ -26,7 +26,7 @@ install.load.package <- function(x) {
 package_vec <- c("here","dplyr","knitr",
                  "ggplot2","rgbif",
                  "here", "CoordinateCleaner",
-                 "terra", "sf") # specify package
+                 "terra", "sf","mapview") # specify package
 
 ## executing install & load for each package
 sapply(package_vec, install.load.package)
@@ -100,7 +100,7 @@ coord_flags <- clean_coordinates(x = insectdata,
                                       lon = "decimalLongitude", 
                                       lat = "decimalLatitude",
                                       species = "acceptedScientificName",
-                                      test = c("centroids", "equal", "gbif", "zeros"))
+                                      test = c("centroids", "equal", "gbif", "zeros","maps"))
 
 # Get a summary of the detected flags
 summary(coord_flags) # only 3 records flagged (centroids)
