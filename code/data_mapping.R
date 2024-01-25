@@ -98,4 +98,55 @@ save(insectdata_buf50m, file= here::here("data","derived_data","insectdata_buf50
 mapview(insectdata_buf50m) # 3313 points
 
 
+# Spatial mapping for vannmiljø data -------------------------------------------
 
+# Vannmiljø and NINA vanndata
+vannmiljo_vanndata <- insectdata %>%
+  dplyr::filter(collectionCode %in% c("NINA Vanndata","vannmiljo"))
+
+vannmiljo_vanndata_locations <- vannmiljo_vanndata %>%
+  dplyr::group_by(locality, decimalLatitude,decimalLongitude) %>%
+  dplyr::summarize(
+    datasetName = paste0(unique(datasetName), collapse = ", "),
+    publisher = paste0(unique(publisher), collapse = ", "),
+    datasetID = paste0(unique(datasetID), collapse = ", "),
+    datasetKey = paste0(unique(datasetKey), collapse = ", "),
+    N_occurrences = length(unique(occurrenceID)),
+    N_samplingEvents = length(unique(eventID)),
+    locationIDs = paste(unique(locationID), collapse=", "),
+    N_taxa = length(unique(scientificName)), # could change to taxonKey?
+    Scientific_names = paste(unique(scientificName), collapse = ", "),
+    phylums = paste(unique(phylum), collapse = ", "),
+    N_methods = length(unique(samplingProtocol)),
+    methods = paste0(unique(samplingProtocol), collapse = ", "),
+    N_yrs = length(unique(year)),
+    years = paste0(unique(year), collapse = ", "),
+    first_year = min(year),
+    last_year = max(year),
+    period_yrs = (last_year - first_year),
+    N_months = length(unique(month)),
+    months = paste0(unique(month), collapse = ", "),
+    field_number = paste0(unique(fieldNumber), collapse = ", "),
+    collectionCode = paste0(unique(collectionCode), collapse = ", "),
+    associatedReferences = paste0(unique(associatedReferences), collapse = ", ")
+  ) 
+
+# Make location data-frame a spatial object 
+vannmiljo_vanndata_locations_sf <- st_as_sf(vannmiljo_vanndata_locations, coords = c("decimalLongitude","decimalLatitude"), crs = 4326, remove = FALSE) # crs identifier for WGS84
+# Create a version with projected coordinates
+vannmiljo_vanndata_locations_sf_P <- sf::st_transform(vannmiljo_vanndata_locations_sf, 32633)
+
+
+# Filter
+vannmiljo_vanndata_buf50m <-  st_join(vannmiljo_vanndata_locations_sf_P,hovedelv_buf_50m, join = st_intersects, largest = TRUE) 
+# largest = TRUE makes sure no extra rows with NAs are added to the dataframe
+
+# Keep only invertebrate datapoints which lay within the lake/buffer. They have the polygon info added
+vannmiljo_vanndata_buf50m  <- vannmiljo_vanndata_buf50m[hovedelv_buf_50m, , op = st_intersects] 
+# filter, get 10 191 observations (from 288 276 observations)
+
+# Save as a rda file
+save(vannmiljo_vanndata_buf50m, file= here::here("data","derived_data","vannmiljo_vanndata_buf50m.rda")) # Ca 2000 locations
+
+# View ----------------
+mapview(vannmiljo_vanndata_buf50m) + mapview(hovedelv_sf_P, color = "blue", alpha = 0.6) + mapview(innsjo_sf_P, color = "blue", alpha = 0.7)
