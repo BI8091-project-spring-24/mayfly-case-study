@@ -47,20 +47,22 @@ study_area <- st_bbox(mayfly_points)
 # Extract coordinates from mayfly_points for mesh
 coords <- st_coordinates(mayfly_points)
 
-# Create mesh with INLA
-max_edge_length <- 5
+# Set max_edge_length and offset_distance for INLA mesh
+max_edge_length <- 5 #not sure if this is teh correct value
 offset_distance <- 5
 
+# Create mesh with INLA
 mesh <- inla.mesh.2d(loc = coords,
                      max.edge = c(max_edge_length),
                      offset = c(offset_distance),
                      crs = projection)
 
+# Inspect mesh
 plot(mesh)
 
 # 2. RUN INTEGRATED SDM ----
-# Specify model -- here we run a model with one spatial covariate and a shared spatial field
 
+# Specify model -- here we run a model with one spatial covariate and a shared spatial field
 model <- intModel(insect_data, spatialCovariates = bio1_scaled, 
                   Coordinates = c('decimalLongitude', 'decimalLatitude'),
                   Projection = projection, Mesh = mesh, responsePA = 'Present')
@@ -69,13 +71,14 @@ model <- intModel(insect_data, spatialCovariates = bio1_scaled,
 # Run integrated model
 modelRun <- fitISDM(model, options = list(control.inla = list(int.strategy = 'eb'), 
                                           safe = TRUE))
+# Extract summary of the model
 summary(modelRun)
 
 # Create prediction plots
-
 predictions <- predict(modelRun, mesh = mesh,
                        mask = region, 
                        spatial = TRUE,
                        fun = 'linear')
 
+# Plot the prediction
 plot(predictions)
