@@ -41,10 +41,22 @@ bio1_scaled <- scale(bio1)
 mayfly_points <- st_as_sf(insect_data, coords = c("decimalLongitude", "decimalLatitude"),
                           crs = 4326)
 
-# Define a study area as a bounding box
+# Define a study area as a bounding box from the points
+study_area <- st_bbox(mayfly_points)
 
-# Retrieve mesh object - not sure what a mesh object is an how to fix that
-mesh <- SolitaryTinamou$mesh
+# Extract coordinates from mayfly_points for mesh
+coords <- st_coordinates(mayfly_points)
+
+# Create mesh with INLA
+max_edge_length <- 5
+offset_distance <- 5
+
+mesh <- inla.mesh.2d(loc = coords,
+                     max.edge = c(max_edge_length),
+                     offset = c(offset_distance),
+                     crs = projection)
+
+plot(mesh)
 
 # Specify model -- here we run a model with one spatial covariate and a shared spatial field
 
