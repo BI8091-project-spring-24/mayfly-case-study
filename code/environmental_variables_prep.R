@@ -33,4 +33,4 @@ bio1_norway <- crop(bio1_reprojected, norway_reprojected,
 
 # Save the new bioclimatic variables
 terra::writeRaster(bio1_norway, 
-                   here("data", "bio1_norway.tif"))
+                   here("data", "bio1_norway"))
