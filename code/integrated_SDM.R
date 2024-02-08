@@ -58,17 +58,13 @@ mesh <- inla.mesh.2d(loc = coords,
 
 plot(mesh)
 
+# 2. RUN INTEGRATED SDM ----
 # Specify model -- here we run a model with one spatial covariate and a shared spatial field
 
-model <- intModel(species, spatialCovariates = NPP, Coordinates = c('X', 'Y'),
+model <- intModel(insect_data, spatialCovariates = bio1_scaled, 
+                  Coordinates = c('decimalLongitude', 'decimalLatitude'),
                   Projection = projection, Mesh = mesh, responsePA = 'Present')
 
-# Plot 1
-
-region <- SolitaryTinamou$region
-
-model$plot(Boundary = FALSE) + 
-  geom_sf(data = st_boundary(region))
 
 # Run integrated model
 modelRun <- fitISDM(model, options = list(control.inla = list(int.strategy = 'eb'), 
