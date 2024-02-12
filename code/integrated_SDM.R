@@ -74,6 +74,16 @@ modelRun <- fitISDM(model, options = list(control.inla = list(int.strategy = 'eb
 # Extract summary of the model
 summary(modelRun)
 
+# Create a "region" from the shape of bio1_scaled
+#get extent of raster
+bio1_extent <- terra::ext(bio1_scaled)
+#create an sf polygon from the extent
+bio1_extent_sf <- st_as_sfc(st_bbox(c(xmin = bio1_extent[1], xmax = bio1_extent[2], 
+                                      ymin = bio1_extent[3], ymax = bio1_extent[4])), 
+                            crs = st_crs(bio1_scaled))
+#create "region" object
+region <- bio1_extent_sf
+
 # Create prediction plots
 predictions <- predict(modelRun, mesh = mesh,
                        mask = region, 
