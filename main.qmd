@@ -8,9 +8,9 @@ editor: visual
 
 Study: A practical application of the pointedSDM package (with a reproducible workflow).
 
-The aim of the project is to investigate how species distribution models can be used with different data types (presence-only, presence-absence, occurrence), and how the inclusion of both "good" and "less informative" data impact possible future predictions of species distribution. The R package pointedSDMs "[https://CRAN.R-project.org/package=PointedSDMs](https://cran.r-project.org/package=PointedSDMs)" by Mostert & O'hara is used for species distribution modelling. The case study will focus on the mayfly species *Baetis rhodani* , which is one of the most common mayfly species in Northern Europe (ref). Mayfly data is accessed through the Global Biodiversity Information Facility (GBIF, ref). Norway is selected as study area, due to the availability of both high-quality species occurrence data (NTNU University Museum) and presence-only data from national monitoring and reseach. Easily accessible physical, climatic and geographical data also makes Norway a good case-study.
+The aim of the project is to investigate how species distribution models can be used with different data types (presence-only, presence-absence, occurrence), and how the inclusion of both "good" and "less informative" data impact possible future predictions of species distribution. The R package pointedSDMs "[https://CRAN.R-project.org/package=PointedSDMs](https://cran.r-project.org/package=PointedSDMs)" by Mostert & O'hara is used for species distribution modelling. The case study will focus on the mayfly species *Baetis rhodani* , which is one of the most common mayfly species in Northern Europe (ref). Mayfly data is accessed through the Global Biodiversity Information Facility (GBIF, ref). Norway is selected as study area, due to the availability of both high-quality species occurrence data (NTNU University Museum) and presence-only data from national monitoring and research. Easily accessible physical, climatic and geographical data also makes Norway a good case-study.
 
-This file documents the different steps in the mayfly case study, created for the course Advanced biology BI8091 Spring 2024.
+This file documents the different steps in the mayfly case study, created for the course Advanced biology BI8091 at NTNU, Spring 2024.
 
 # Setup
 
@@ -245,7 +245,7 @@ Description: The analysis consists of several steps: Preparation of environmenta
 
 ## Selecting invertebrate datapoints
 
-To limit datapoints with spatial inaccuracies, we want to see how far the _Baetis rhodani_ datapoints typically are from freshwater. Since the speices is found in running water in its larval stages, the Norwagian river network (Elvenett) will be used to calculate the distance. Then the distribution of distances to rivers will be plotted. This information will aid us in the next step, which is to limit the raster-layer used in the SDM. 
+To limit data points with spatial inaccuracies, we want to see how far the *Baetis rhodani* data points typically are from freshwater. Since the species is found in running water in its larval stages, the Norwegian river network (Elvenett) will be used to calculate the distance. Then the distribution of distances to rivers will be plotted. This information will aid us in the next step, which is to limit the raster-layer used in the SDM.
 
 ```{r insect_distance_to_river}
 # Code here
@@ -254,14 +254,12 @@ To limit datapoints with spatial inaccuracies, we want to see how far the _Baeti
 
 ## Limit raster layer
 
-Want to only model the area of Norway which is within a suitable distance from rivers. _Baetis rhodani_ adults are winged and inhabit the terrestrial habitat for a limited time in order to reproduce. They cannot feed in their adult stage, so their life on land is short - typically lasting a few days. Therefore, winged adults may have been registered in areas which are not suitable for nymphs, and we aim to exclude adult observations to improve precision of the SDM.
+Want to only model the area of Norway which is within a suitable distance from rivers. *Baetis rhodani* adults are winged and inhabit the terrestrial habitat for a limited time in order to reproduce. They cannot feed in their adult stage, so their life on land is short - typically lasting a few days. Therefore, winged adults may have been registered in areas which are not suitable for nymphs, and we aim to exclude adult observations to improve precision of the SDM.
 
 ```{r}
 
 
 ```
-
-
 
 ## SDMs
 
@@ -276,8 +274,6 @@ Using species distribution model(s) to investigate the distribution of the mayfl
 source(here::here("code","integrated_SDM.R"))
 
 ```
-
-
 
 # Citations
 
