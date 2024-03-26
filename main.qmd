@@ -10,7 +10,7 @@ This file documents the different steps in the mayfly case study, created for th
 
 ## Setup
 
-Setup: Load needed packages, and download data.
+Setup: Load needed packages, and download data. Needs to be run before the rest of the script.
 
 ```{r setup}
 #| output: false
@@ -43,25 +43,28 @@ The example data in this case is *Baetis rhodani* occurrence data from GBIF. Exa
 
 -   Year range: 1950-current
 
+Script for creating a new download request to GBIF. Only run if necessary.
+
+```{r new_download_request}
+# Load script: Import download
+source(here::here("code","1_1_download.R"))
+
+```
+
+Script for importing existing download request.
+
 ```{r load_data}
 #| output: true
 #| error: true
 
-# Load script
-# this doesn't work for me: (A)
-#  source(here::here("code","download.R"))
-
-#### Loading already downloaded data (TEMPORARY SOLUTION) -------------------
-
-# data URL
-mayfly_records <- "https://ntnu.box.com/shared/static/oky8o2cha6nek1jjexum29qqh0fk7asm.rda"
+# Load script: Import download
+source(here::here("code","1_2_import_download.R"))
 
 # Download file (NB: requires you to make "data" directory beforehand)
 #download.file(mayfly_records, here("data", "insectdata.rda"))
 
 ## Load data
-load(here("data", "insectdata.rda"))
-
+# load(here("data", "insectdata.rda"))
 ```
 
 ## Data cleaning
@@ -176,10 +179,27 @@ nrow(insectdata_no_flags) #23547
 nrow(insectdata_low_uncertainty)#23516 (removed 31 records - not so bad)
 
 ```
+Save the cleaned files. The cleaned dataset is now called insectdata_low_uncertainty (?).
+```{r cleaned_datafiles}
+# Save as .rda files
+save(insectdata_no_flags, file= here::here("data","derived_data","insectdata_no_flags.rda"))
+
+save(insectdata_low_uncertainty, file= here::here("data","derived_data","insectdata_low_uncertainty.rda"))
+
+```
+
+Load cleaned datafiles. Alternative to running all the cleaning steps.
+```{r load_cleaned_datafiles}
+load(here::here("data","derived_data","insectdata_no_flags.rda"))
+
+load(here::here("data","derived_data","insectdata_low_uncertainty.rda"))
+
+```
+
 
 ## Data exploration
 
-Mijødirektoratet and NINA are both missing information on sampling protocol:
+Miljødirektoratet and NINA are both missing information on sampling protocol:
 
 ```{r}
 only_mdir <- insectdata_low_uncertainty |> filter(institutionCode == "miljodir")
@@ -199,6 +219,7 @@ ggplot() +
              aes(x = decimalLongitude, y = decimalLatitude),
              colour = "darkred",
              size = 0.5) +
+  ggtitle("Only Miljodirektoratet") +
   theme_classic()
 
 ggplot() +
@@ -207,6 +228,7 @@ ggplot() +
              aes(x = decimalLongitude, y = decimalLatitude),
              colour = "darkred",
              size = 0.5) +
+  ggtitle("Only NINA") +
   theme_classic()
 ```
 

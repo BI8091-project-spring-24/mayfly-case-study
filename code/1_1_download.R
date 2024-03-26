@@ -1,6 +1,6 @@
 ################################################################################
 
-# Download file
+# 1.1 Download file
 
 ################################################################################
 
@@ -36,7 +36,7 @@ occ_download_wait(download_key)
 #  Download key: 0058633-231120084113126
 # Download link: https://api.gbif.org/v1/occurrence/download/request/0058633-231120084113126.zip
 
-# Import and save --------------------------------------------------------------
+# Import GBIF download and save ------------------------------------------------
 
 # Import
 insectdata <- occ_download_get(download_key) %>%
