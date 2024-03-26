@@ -4,11 +4,15 @@ format: html
 editor: visual
 ---
 
-## Info
+# Information
 
-This file documents the different steps in the mayfly case study, created for the course Advanced biology BI8091 spring 2024.
+Study: A practical application of the pointedSDM package (with a reproducible workflow).
 
-## Setup
+The aim of the project is to investigate how species distribution models can be used with different data types (presence-only, presence-absence, occurrence), and how the inclusion of both "good" and "less informative" data impact possible future predictions of species distribution. The R package pointedSDMs "[https://CRAN.R-project.org/package=PointedSDMs](https://cran.r-project.org/package=PointedSDMs)" by Mostert & O'hara is used for species distribution modelling. The case study will focus on the mayfly species *Baetis rhodani* , which is one of the most common mayfly species in Northern Europe (ref). Mayfly data is accessed through the Global Biodiversity Information Facility (GBIF, ref). Norway is selected as study area, due to the availability of both high-quality species occurrence data (NTNU University Museum) and presence-only data from national monitoring and reseach. Easily accessible physical, climatic and geographical data also makes Norway a good case-study.
+
+This file documents the different steps in the mayfly case study, created for the course Advanced biology BI8091 Spring 2024.
+
+# Setup
 
 Setup: Load needed packages, and download data. Needs to be run before the rest of the script.
 
@@ -26,7 +30,8 @@ install.load.package <- function(x) {
 package_vec <- c("here","dplyr","knitr",
                  "ggplot2","rgbif",
                  "here", "CoordinateCleaner",
-                 "terra", "sf","mapview") # specify package
+                 "terra", "sf","mapview",
+                 "PointedSDMs","INLA") # specify packages
 
 ## executing install & load for each package
 sapply(package_vec, install.load.package)
@@ -67,9 +72,9 @@ source(here::here("code","1_2_import_download.R"))
 # load(here("data", "insectdata.rda"))
 ```
 
-## Data cleaning
+# Data cleaning
 
-### 1. Remove flagged coordinate and time records
+## 1. Remove flagged coordinate and time records
 
 First, plot the raw coordinates to get an overview of the data:
 
@@ -131,7 +136,7 @@ time_flags <- cf_age(x = insectdata_coords,
 insectdata_no_flags <- insectdata_coords[time_flags, ] 
 ```
 
-### 2. Use metadata to improve data quality
+## 2. Use metadata to improve data quality
 
 To improve the precision and our confidence in the data further, we can use the metadata included in the dataset.
 
@@ -179,7 +184,9 @@ nrow(insectdata_no_flags) #23547
 nrow(insectdata_low_uncertainty)#23516 (removed 31 records - not so bad)
 
 ```
+
 Save the cleaned files. The cleaned dataset is now called insectdata_low_uncertainty (?).
+
 ```{r cleaned_datafiles}
 # Save as .rda files
 save(insectdata_no_flags, file= here::here("data","derived_data","insectdata_no_flags.rda"))
@@ -189,6 +196,7 @@ save(insectdata_low_uncertainty, file= here::here("data","derived_data","insectd
 ```
 
 Load cleaned datafiles. Alternative to running all the cleaning steps.
+
 ```{r load_cleaned_datafiles}
 load(here::here("data","derived_data","insectdata_no_flags.rda"))
 
@@ -196,8 +204,7 @@ load(here::here("data","derived_data","insectdata_low_uncertainty.rda"))
 
 ```
 
-
-## Data exploration
+# Data exploration
 
 Miljødirektoratet and NINA are both missing information on sampling protocol:
 
@@ -232,13 +239,47 @@ ggplot() +
   theme_classic()
 ```
 
-## Analysis
+# Analysis
 
-```{r}
+Description: The analysis consists of several steps: Preparation of environmental variables, selection of invertebrate datapoints, running the SDMs.
+
+## Selecting invertebrate datapoints
+
+To limit datapoints with spatial inaccuracies, we want to see how far the _Baetis rhodani_ datapoints typically are from freshwater. Since the speices is found in running water in its larval stages, the Norwagian river network (Elvenett) will be used to calculate the distance. Then the distribution of distances to rivers will be plotted. This information will aid us in the next step, which is to limit the raster-layer used in the SDM. 
+
+```{r insect_distance_to_river}
+# Code here
 
 ```
 
-## Citations
+## Limit raster layer
+
+Want to only model the area of Norway which is within a suitable distance from rivers. _Baetis rhodani_ adults are winged and inhabit the terrestrial habitat for a limited time in order to reproduce. They cannot feed in their adult stage, so their life on land is short - typically lasting a few days. Therefore, winged adults may have been registered in areas which are not suitable for nymphs, and we aim to exclude adult observations to improve precision of the SDM.
+
+```{r}
+
+
+```
+
+
+
+## SDMs
+
+Using species distribution model(s) to investigate the distribution of the mayfly species *Baetis rhodani* in Norway. The goal is to compare the performance and predictions (?) of a SDM using
+
+1)  Only high-quality data from structured sampling done by NTNU University museum. For this data, we have information on species occurrence, sampling method, and number of individuals per sampling unit.
+
+2)  High quality NTNU University data as in 1, as well as lower-quality presence-only data
+
+```{r SDMs}
+# Run SDM script(s)
+source(here::here("code","integrated_SDM.R"))
+
+```
+
+
+
+# Citations
 
 Citing R and packages used, including package version.
 
