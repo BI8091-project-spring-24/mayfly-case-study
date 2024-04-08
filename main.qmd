@@ -255,7 +255,7 @@ Not many studies have measured the dispersal distance of Mayflies. A study from 
 
 *Are most datapoints within 3700 meters from a main river?*
 
-See file "data_mapping.R". Plotting a figure of the results below.
+See file "data_mapping.R". Plotting a figure of the results below. When aggregating insectdata to spatial datapoints (based on lat,long), we get 5964 points in total. Keeping only datapoints within 3700 meters from a river leaves x datapoints.
 
 ```{r insect_distance_to_river}
 # Results

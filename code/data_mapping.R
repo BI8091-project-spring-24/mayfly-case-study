@@ -9,30 +9,28 @@
 # 1. Load lake and river data --------------------------------------------------
 
 ## Dataset "Elvenett, hovedelv" from NVE, covering all of Norway including Svalbard
+# Format: GeoJSON v1.0, Geographical coordinates WGS84 - lat long, overlapping
 hovedelv_sf  <- sf::read_sf("https://ntnu.box.com/shared/static/k8z5amhu343xwdtorbafcm0qcxug4uy3.geojson")
 # Change to projected coordinates
-hovedelv_sf_P <- sf::st_transform(hovedelv_sf, 32633) # N33
+hovedelv_sf_P <- sf::st_transform(hovedelv_sf, 32633) # UTM zone N33
+
+## Dataset #Elvenett" from NVE, covering all of Norway including Svalbard
+# Format: GeoJSON v1.0, Geographical coordinates WGS84 - lat long, overlapping
+elvenett_sf  <- sf::read_sf(" ")
+# Change to projected coordinates
+elvenett_sf_P <- sf::st_transform(elvenett_sf, 32633) # UTM zone N33
 
 ## Dataset Norwegian lakes
-innsjo_sf  <- sf::read_sf("https://ntnu.box.com/shared/static/dvv6w3bu1o3gdgga0ucl45ry5sofrv8g.geojson")
+#innsjo_sf  <- sf::read_sf("https://ntnu.box.com/shared/static/dvv6w3bu1o3gdgga0ucl45ry5sofrv8g.geojson")
 # Change to projected coordinates
-innsjo_sf_P <- sf::st_transform(innsjo_sf, 32633) # N33
-
+#innsjo_sf_P <- sf::st_transform(innsjo_sf, 32633) # N33
 
 # 2. Load cleaned insectdata ---------------------------------------------------
 
-# load(file = here::here("data", "cleaned_insectdata.rda"))
-
-# Add download link ----
-mayfly_records <- "https://ntnu.box.com/shared/static/oky8o2cha6nek1jjexum29qqh0fk7asm.rda"
-# Download file (NB: requires you to make "data" directory beforehand)
-download.file(mayfly_records, here("data", "insectdata.rda"))
-## 1.2. Load data ----
-load(here("data", "insectdata.rda"))
-
+load(file = here::here("data","derived_data","insectdata_low_uncertainty.rda"))
 
 # 3. Create spatial file showing all sampling locations ------------------------
-insectdata_locations <- insectdata %>%
+insectdata_locations <- insectdata_low_uncertainty %>%
   dplyr::group_by(locality, decimalLatitude,decimalLongitude) %>%
   dplyr::summarize(
     datasetName = paste0(unique(datasetName), collapse = ", "),
@@ -66,10 +64,47 @@ insectdata_locations_sf_P <- sf::st_transform(insectdata_locations_sf, 32633)
 
 # Plot data --------------------------------------------------------------------
 
-mapview(insectdata_locations_sf_P, col.regions = "red") + mapview(hovedelv_sf_P, color = "blue", alpha = 0.6) + mapview(innsjo_sf_P, color = "blue", alpha = 0.7)
+mapview(insectdata_locations_sf_P, col.regions = "red") + mapview(hovedelv_sf_P, color = "blue", alpha = 0.6)
 
 
-# Spatial filtering ------------------------------------------------------------
+# Spatial filtering 1 ----------------------------------------------------------
+# Keep only locations within 3700 meters from rivers, which is the best estimate
+# of adult flight distance available.
+
+# Create 3700 m buffer
+hovedelv_buf_3700m <- sf::st_buffer(hovedelv_sf_P,3700) 
+# Store as a geopackage file for later use (done once)
+hovedelv_buf_3700m %>%
+  st_write(here::here("data","derived_data","hovedelv_buf_3700m.gpkg"))
+
+hovedelv_buf_3700m <- st_read(here::here("data","derived_data","hovedelv_buf_3700m.gpkg"))
+
+# Filter
+# Join invertebrate datapoints with info from the buffer they overlap with
+insectdata_buf3700m <-  st_join(insectdata_locations_sf_P,hovedelv_buf_3700m, join = st_intersects, largest = TRUE) 
+# largest = TRUE makes sure no extra rows with NAs are added to the dataframe
+
+# Keep only invertebrate datapoints which lay within the buffer. They have the polygon info added
+insectdata_buf3700m  <- insectdata_buf3700m[hovedelv_buf_3700m, , op = st_intersects] 
+# filter, get 5826 observations (from 5964 observations) so lost 138 observations
+
+# Save as a rda file
+save(insectdata_buf3700m, file= here::here("data","derived_data","insectdata_buf3700m.rda"))
+
+
+# Subset with only datapoints outside the buffer
+# Remove based on coordinate column
+insectdata_buf3700m_utenfor <- insectdata_locations_sf_P %>%
+  filter(!geometry %in% insectdata_buf3700m$geometry) # 138 observations
+  
+# View the locataions with insectdata outside the buffer
+mapview(insectdata_buf3700m_utenfor, col.regions = "red") + mapview(hovedelv_sf_P, color = "blue", alpha = 0.6)
+  # Almost all are close to a river, but not one of the large ones from NVE hovedelv. 
+  # Could try to use the full river dataset for increased precision
+
+
+
+# Spatial filtering 2 ----------------------------------------------------------
 
 # Keep only locations within 50 meters from rivers
 
