@@ -249,8 +249,18 @@ Description: The analysis consists of several steps: Preparation of environmenta
 
 To limit data points with spatial inaccuracies, we want to see how far the *Baetis rhodani* data points typically are from freshwater. Since the species is found in running water in its larval stages, the Norwegian river network (Elvenett) will be used to calculate the distance. Then the distribution of distances to rivers will be plotted. This information will aid us in the next step, which is to limit the raster-layer used in the SDM.
 
+*How far can adult B. rhodani fly?*
+
+Not many studies have measured the dispersal distance of Mayflies. A study from 2021 aggregating flying distances for EPTs (Arce et al., 2021) cite only one study for *B. rhodani*, which had measured adults flying more than 3700 meters (Bagge, 1995).
+
+*Are most datapoints within 3700 meters from a main river?*
+
+See file "data_mapping.R". Plotting a figure of the results below.
+
 ```{r insect_distance_to_river}
-# Code here
+# Results
+
+
 
 ```
 
@@ -278,6 +288,22 @@ source(here::here("code","integrated_SDM.R"))
 ```
 
 # Citations
+
+## Literature references
+
+Manual reference list
+
+-   Alp, M., Keller, I., Westram, A. M., & Robinson, C. T. (2012). How river structure and biological traits influence gene flow: a population genetic study of two stream invertebrates with differing dispersal abilities. *Freshwater Biology*, *57*(5), 969–981. https://doi.org/10.1111/j.1365-2427.2012.02758.x
+
+-   Bagge, P. (1995). Emergence and upstream flight of lotic mayflies and caddisflies (Ephemeroptera and Trichoptera) in a lake outlet, central Finland. *Entomologica Fennica*, *6*(2-3), 91–97. https://doi.org/10.33338/ef.83844
+
+-   Peredo Arce, A., Hörren, T., Schletterer, M., & Kail, J. (2021). How far can EPTs fly? A comparison of empirical flying distances of riverine invertebrates and existing dispersal metrics. *Ecological Indicators*, *125*, 107465. https://doi.org/10.1016/j.ecolind.2021.107465
+
+```{r}
+
+```
+
+## R packages
 
 Citing R and packages used, including package version.
 
