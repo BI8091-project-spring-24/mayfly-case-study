@@ -195,7 +195,9 @@ save(insectdata_low_uncertainty, file= here::here("data","derived_data","insectd
 
 ```
 
-Load cleaned datafiles. Alternative to running all the cleaning steps.
+## Load cleaned datafiles.
+
+Alternative to running all the cleaning steps.
 
 ```{r load_cleaned_datafiles}
 load(here::here("data","derived_data","insectdata_no_flags.rda"))
