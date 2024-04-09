@@ -161,8 +161,10 @@ mapview(insectdata_buf3700m_utenfor, col.regions = "red") + mapview(hovedelv_sf_
 
 # Spatial filtering 2 ----------------------------------------------------------
 
-# Keep only locations within 50 meters from rivers. Want to see how many % of datapoints 
-# which we know should be in water that lie within this distance.
+# Keep only locations within X meters from rivers. Want to see how many % of datapoints which we know should be in water that lie within this distance.
+
+
+### Filter 50m with hovedelv ----
 
 # Create 50 m buffer
 hovedelv_buf_50m <- sf::st_buffer(hovedelv_sf_P,50) 
@@ -172,7 +174,23 @@ hovedelv_buf_50m %>%
 
 hovedelv_buf_50m <- st_read(here::here("data","derived_data","hovedelv_buf_50m.gpkg"))
 
-# Creat 100m buffer
+# Join invertebrate datapoints with info from the lake/buffer they overlap with
+insectdata_buf50m <-  st_join(insectdata_locations_water_sf_P,hovedelv_buf_50m, join = st_intersects, largest = TRUE) 
+# largest = TRUE makes sure no extra rows with NAs are added to the dataframe
+
+# Keep only invertebrate datapoints which lay within the lake/buffer. They have the polygon info added
+insectdata_buf50m  <- insectdata_buf50m[hovedelv_buf_50m, , op = st_intersects] 
+# filter, get 573 observations (from 1274 observations), ca 45 % 
+
+# Save as a rda file
+save(insectdata_buf50m, file= here::here("data","derived_data","insectdata_buf50m.rda"))
+
+mapview(insectdata_buf50m, col.regions = "red") + mapview(hovedelv_sf_P, color = "blue", alpha = 0.6) + mapview(insectdata_locations_water_sf_P, col.regions = "orange")
+  # see that we really should be using the elvenett dataset and increase the buffer to maybe 100 meters?
+
+### Filter 100m with hovedelv ----
+
+# Create 100m buffer
 hovedelv_buf_100m <- sf::st_buffer(hovedelv_sf_P,100) 
 # Store as a geopackage file for later use (done once)
 hovedelv_buf_100m %>%
@@ -180,49 +198,40 @@ hovedelv_buf_100m %>%
 
 hovedelv_buf_100m <- st_read(here::here("data","derived_data","hovedelv_buf_100m.gpkg"))
 
-# Creat 100m buffer for elvenett
+# Not finised, rather did it with the more detailed elvenett below
+
+### Filter 100m with elvenett ----
+
+# OBS! Large files, takes long to run.
+
+# Create 100m buffer for elvenett
 elvenett_buf_100m <- sf::st_buffer(elvenett_sf_P,100) 
 # Store as a geopackage file for later use (done once)
 elvenett_buf_100m %>%
   st_write(here::here("data","derived_data","elvenett_buf_100m.gpkg"))
 
-# elvenett_buf_100m <- st_read(here::here("data","derived_data","hovedelv_buf_100m.gpkg"))
-
-# Filter 50m
-# Join invertebrate datapoints with info from the lake/buffer they overlap with
-insectdata_buf50m <-  st_join(insectdata_locations_water_sf_P,hovedelv_buf_50m, join = st_intersects, largest = TRUE) 
-# largest = TRUE makes sure no extra rows with NAs are added to the dataframe
-
-# Keep only invertebrate datapoints which lay within the lake/buffer. They have the polygon info added
-insectdata_buf50m  <- insectdata_buf50m[hovedelv_buf_50m, , op = st_intersects] 
-# filter, get 573 observations (from 1274 observations)
-
-mapview(insectdata_buf50m, col.regions = "red") + mapview(hovedelv_sf_P, color = "blue", alpha = 0.6) + mapview(insectdata_locations_water_sf_P, col.regions = "orange")
-  # see that we really should be using the elvenett dataset and increase the buffer to maybe 100 meters?
 
 
-# Filter 100m with elvenett
 # Join invertebrate datapoints with info from the lake/buffer they overlap with
 insectdata_buf100m <-  st_join(insectdata_locations_water_sf_P,elvenett_buf_100m, join = st_intersects, largest = TRUE) 
 # largest = TRUE makes sure no extra rows with NAs are added to the dataframe
 
 # Keep only invertebrate datapoints which lay within the lake/buffer. They have the polygon info added
 insectdata_buf100m  <- insectdata_buf100m[elvenett_buf_100m, , op = st_intersects] 
-# filter, get 573 observations (from 1274 observations)
+# filter, get 1062 observations (from 1274 observations), 83 %
 
+
+# View
 mapview(insectdata_buf100m, col.regions = "red") + mapview(hovedelv_sf_P, color = "blue", alpha = 0.6) + mapview(insectdata_locations_water_sf_P, col.regions = "orange")
 
 
-# Testing different distances
-(573/1274)*100 # 50 meters ish 45 %
 
+# Creating raster --------------------------------------------------------------
 
-# Save as a rda file
-save(insectdata_buf50m, file= here::here("data","derived_data","insectdata_buf50m.rda"))
+install.packages("stars")
+library(stars)
 
-
-# View the 3000 locataions with insectdata which lie in or within 50 meters from a river.
-mapview(insectdata_buf50m) # 3313 points
+raster_elvenett_buf_100m <- stars::st_rasterize(elvenett_buf_100m)
 
 
 # Spatial mapping for vannmiljø data -------------------------------------------

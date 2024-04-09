@@ -243,11 +243,11 @@ ggplot() +
 
 # Analysis
 
-Description: The analysis consists of several steps: Preparation of environmental variables, selection of invertebrate datapoints, running the SDMs.
+Description: The analysis consists of several steps: Selection of invertebrate datapoints, preparation of environmental variables, running the SDMs.
 
 ## Selecting invertebrate datapoints
 
-To limit data points with spatial inaccuracies, we want to see how far the *Baetis rhodani* data points typically are from freshwater. Since the species is found in running water in its larval stages, the Norwegian river network (Elvenett) will be used to calculate the distance. Then the distribution of distances to rivers will be plotted. This information will aid us in the next step, which is to limit the raster-layer used in the SDM.
+To limit data points with spatial inaccuracies, we want to see how far the *Baetis rhodani* data points typically are from freshwater. The species is mainly found in running water (rivers, creeks) in its larval stages, and can cover larger distances in its terrestrial stage. The Norwegian river network (elvenett, from NVE) is therefore useful to locate suitable habitat for the species. This information will aid us in the next step, which is to limit the raster-layer used in the SDM.
 
 *How far can adult B. rhodani fly?*
 
@@ -255,10 +255,31 @@ Not many studies have measured the dispersal distance of Mayflies. A study from 
 
 *Are most datapoints within 3700 meters from a main river?*
 
-See file "data_mapping.R". Plotting a figure of the results below. When aggregating insectdata to spatial datapoints (based on lat,long), we get 5964 points in total. Keeping only datapoints within 3700 meters from a river leaves x datapoints.
+Almost all the datapoints (5826 of 5964) were within 3700 meters from a main river (NVE hovedelv vector layer). See file "data_mapping.R" for details.
 
-```{r insect_distance_to_river}
-# Results
+*How far are known aquatic samples from the river?*
+
+By using a subset of the datapoints with known aquatic sampling methods, we want to investigate how much coordinate inaccuracies we would expect to find in aquatic sampling locations. This is useful for the data we lack sampling information on (X %). We want to filter away the datapoints that are likely terrestrial, which is assumed to be further from the river, and keep points close to the river which are likely aquatic samples.
+
+Different buffers for the river network (elvenett) were created, and spatial filtering was performed to investigate how many % of the aquatic data points that were retained. Using a 50 meter buffer was too short (coordinate inaccuracies & broad rivers not well covered), while 100 meters seem to be sufficient (capturing 83 % of data points). Code found in "data_mapping.R".
+
+Lastly, spatial filtering was performed with the 100 meter river buffer on the total insect dataset. Resulting data points are plotted below.
+
+```{r insects_100m_from_river}
+# Load data
+load(here::here("data","derived_data","insectdata_buf100m.rda"))
+# Plot points on interactive map
+mapview(insectdata_buf100m, col.regions = "red")
+
+```
+
+Dividing data into two subsets: one with known aquatic sampling and the other with unknown sampling. See script "".
+
+```{r}
+
+insectdata_aquatic <- 
+
+insectdata_unknown <-
 
 
 
@@ -268,8 +289,10 @@ See file "data_mapping.R". Plotting a figure of the results below. When aggregat
 
 Want to only model the area of Norway which is within a suitable distance from rivers. *Baetis rhodani* adults are winged and inhabit the terrestrial habitat for a limited time in order to reproduce. They cannot feed in their adult stage, so their life on land is short - typically lasting a few days. Therefore, winged adults may have been registered in areas which are not suitable for nymphs, and we aim to exclude adult observations to improve precision of the SDM.
 
-```{r}
+Creating a 100 meter buffer around the "elvenett" river vector downloaded from NVE, which covers all rivers in Norway. This is then converted to a raster, with 100 x 100 meter resolution. See code "4_raster.R".
 
+```{r}
+# Plot of raster layer?
 
 ```
 
