@@ -81,11 +81,18 @@ insectdata_buf100m  <- insectdata_buf100m[elvenett_buf_100m, , op = st_intersect
 save(insectdata_buf100m, file = here("data", "derived_data","insectdata_buf100m.rda"))
 
 
-# 6. Create filtered occurrence-dataset ----
+# 6. Create filtered occurrence dataset ----
 
 # Want to keep the occurrence-records corresponding to the selected localities.
 # Need to filter the file "insectdata_low_uncertainty.rda"
 
-insectdata_low_uncertainty_100m <- insectdata_low_uncertainty %>%
-  filter()
+# Drop geometry
+sf::st_drop_geometry(insectdata_buf100m)
+
+# Perform an inner join, keep only occurrence rows with coordinates found in the 
+# filtered locality dataset
+insectdata_low_uncertainty_100m <- inner_join(insectdata_low_uncertainty,insectdata_buf100m, by = c("decimalLatitude","decimalLongitude"))
+  
+# Save file
+save(insectdata_low_uncertainty_100m, file = here("data", "derived_data","insectdata_low_uncertainty_100m.rda"))
 

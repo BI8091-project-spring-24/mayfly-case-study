@@ -273,10 +273,13 @@ mapview(insectdata_buf100m, col.regions = "red")
 
 ```
 
-Dividing data into two subsets: one with known aquatic sampling and the other with unknown sampling. See script "".
+Dividing data into two subsets: one with known aquatic sampling and the other with unknown sampling. See script "3_spatial_filtering.R".
 
 ```{r}
+# Load spatially filtered occurrence dataset
+load(here::here("data","derived_data","insectdata_low_uncertainty_100m.rda"))
 
+# Create subsets
 insectdata_aquatic <- 
 
 insectdata_unknown <-
