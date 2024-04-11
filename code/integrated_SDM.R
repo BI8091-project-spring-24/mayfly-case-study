@@ -9,6 +9,7 @@ library(here)
 library(dplyr)
 library(terra)
 library(sf)
+library(giscoR)
 library(PointedSDMs)
 library(INLA)
 
@@ -35,30 +36,28 @@ bio1 <- terra::rast(here("data", "bio1_norway.tif"))
 bio1_scaled <- scale(bio1)
 
 ## 1.2. Create mesh object ---- 
-# Mesh objects are used by INLA to aproximate spatial model for the IntegratedSDM
 
-# Create spatial points dataframe from occurrence records
-mayfly_points <- st_as_sf(insect_data, coords = c("decimalLongitude", "decimalLatitude"),
-                          crs = 4326)
+# Credits for code: Philip Mostert
 
-# Define a study area as a bounding box from the points
-study_area <- st_bbox(mayfly_points)
+# Set CRS
+CRS <- '+proj=utm +zone=32 +ellps=WGS84 +datum=WGS84 +units=km +no_defs'
 
-# Extract coordinates from mayfly_points for mesh
-coords <- st_coordinates(mayfly_points)
+# Download geographical data for Norway 
+Norway <- giscoR::gisco_get_countries(resolution = 60)
+Norway <- Norway[Norway$NAME_ENGL == 'Norway',]
 
-# Set max_edge_length and offset_distance for INLA mesh
-max_edge_length <- 5 #not sure if this is teh correct value
-offset_distance <- 5
+# Transform object to the CRS set above
+Norway <- sf::st_transform(Norway, CRS)
 
-# Create mesh with INLA
-mesh <- inla.mesh.2d(loc = coords,
-                     max.edge = c(max_edge_length),
-                     offset = c(offset_distance),
-                     crs = projection)
+# Crate mesh
+Mesh <- INLA::inla.mesh.2d(boundary = fm_sp2segment(Norway),
+                           cutoff = 10,
+                           max.edge=c(60, 80) * 0.25,
+                           min.angle = 20,
+                           offset= c(20,50), 
+                           crs = st_crs(CRS))
 
-# Inspect mesh
-plot(mesh)
+
 
 # 2. RUN INTEGRATED SDM ----
 
