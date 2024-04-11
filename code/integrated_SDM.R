@@ -61,10 +61,23 @@ Mesh <- INLA::inla.mesh.2d(boundary = fm_sp2segment(Norway),
 
 # 2. RUN INTEGRATED SDM ----
 
+## 2.1. Prepare list with presence-only and presence-absence data ----
+
+### 2.1.1. Presence-only data ----
+
+# All data coming from datasets that do not have samplingProtocol = "Rot (1 min)"
+
+presence_only <- insect_data |>
+  filter(samplingProtocol != "Rot (1 min)") |>
+  select(decimalLongitude, decimalLatitude) |>
+  rename(X = decimalLongitude, Y = decimalLatitude)
+
+## 2.1. Run Integraded SDM ----
+
 # Specify model -- here we run a model with one spatial covariate and a shared spatial field
 model <- intModel(insect_data, spatialCovariates = bio1_scaled, 
                   Coordinates = c('decimalLongitude', 'decimalLatitude'),
-                  Projection = projection, Mesh = mesh, responsePA = 'Present')
+                  Projection = projection, Mesh = Mesh, responsePA = 'Present')
 
 
 # Run integrated model
