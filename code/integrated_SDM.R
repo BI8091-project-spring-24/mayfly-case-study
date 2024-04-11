@@ -72,6 +72,23 @@ presence_only <- insect_data |>
   select(decimalLongitude, decimalLatitude) |>
   rename(X = decimalLongitude, Y = decimalLatitude)
 
+### 2.1.2. Presence-absence data ----
+
+# All data coming from datasets where samplingProtocol = "Rot (1 min)"
+
+# Extract records with samplingProtocol = "Rot (1 min)"
+rot_samples <- insect_data |>
+  filter(samplingProtocol == "Rot (1 min)")
+
+levels(as.factor(rot_samples$occurrenceStatus)) # no luck, they are all present => have to create our own presence absence df
+
+# Group occurrences by dataset name
+rot_datasets <- rot_samples |>
+  group_by(datasetName) |>
+  summarize(species_list = list(unique(species)), .groups = 'drop') |>
+  left_join(rot_samples %>% select(decimalLongitude, decimalLatitude, datasetName) 
+            %>% distinct(), by = "datasetName")
+
 ## 2.1. Run Integraded SDM ----
 
 # Specify model -- here we run a model with one spatial covariate and a shared spatial field
