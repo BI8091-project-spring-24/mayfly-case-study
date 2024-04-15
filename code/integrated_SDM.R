@@ -82,12 +82,7 @@ rot_samples <- insect_data |>
 
 levels(as.factor(rot_samples$occurrenceStatus)) # no luck, they are all present => have to create our own presence absence df
 
-# Group occurrences by dataset name
-rot_datasets <- rot_samples |>
-  group_by(datasetName) |>
-  summarize(species_list = list(unique(species)), .groups = 'drop') |>
-  left_join(rot_samples %>% select(decimalLongitude, decimalLatitude, datasetName) 
-            %>% distinct(), by = "datasetName")
+# Create pseudo-absences
 
 ## 2.1. Run Integraded SDM ----
 
