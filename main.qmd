@@ -8,7 +8,7 @@ editor: visual
 
 Study: A practical application of the pointedSDM package (with a reproducible workflow).
 
-The aim of the project is to investigate how species distribution models can be used with different data types (presence-only, presence-absence, occurrence), and how the inclusion of both "good" and "less informative" data impact possible future predictions of species distribution. The R package pointedSDMs "[https://CRAN.R-project.org/package=PointedSDMs](https://cran.r-project.org/package=PointedSDMs)" by Mostert & O'hara is used for species distribution modelling. The case study will focus on the mayfly species *Baetis rhodani* , which is one of the most common mayfly species in Northern Europe (ref). Mayfly data is accessed through the Global Biodiversity Information Facility (GBIF, ref). Norway is selected as study area, due to the availability of both high-quality species occurrence data (NTNU University Museum) and presence-only data from national monitoring and research. Easily accessible physical, climatic and geographical data also makes Norway a good case-study.
+The aim of the project is to investigate how species distribution models can be used with different data types (presence-only, presence-absence, occurrence), and how the inclusion of both "good" and "less informative" data impact possible future predictions of species distribution. The R package pointedSDMs "[https://CRAN.R-project.org/package=PointedSDMs](https://cran.r-project.org/package=PointedSDMs)" by Mostert & O'hara is used for species distribution modelling. The case study will focus on the mayfly species *Baetis rhodani* , also called the Large dark olive mayfly. *B. rhodani* is commonly found in running waters all over Norway (Artsdatabanken, 2021) and can also be found in most of Western-Europe. Mayfly data is accessed through the Global Biodiversity Information Facility (GBIF, ref). Norway is selected as study area, due to the availability of both high-quality species occurrence data (NTNU University Museum) and presence-only data from national monitoring and research. Easily accessible physical, climatic and geographical data also makes Norway a good case-study.
 
 This file documents the different steps in the mayfly case study, created for the course Advanced biology BI8091 at NTNU, Spring 2024.
 
@@ -321,6 +321,8 @@ source(here::here("code","integrated_SDM.R"))
 Manual reference list
 
 -   Alp, M., Keller, I., Westram, A. M., & Robinson, C. T. (2012). How river structure and biological traits influence gene flow: a population genetic study of two stream invertebrates with differing dispersal abilities. *Freshwater Biology*, *57*(5), 969–981. https://doi.org/10.1111/j.1365-2427.2012.02758.x
+
+-   Artsdatabanken (2021). **Vanlig smådøgnflue *Baetis rhodani* (Pictet, 1843-45).** Retrieved 13.05.2024. <https://artsdatabanken.no/Taxon/Baetis%20rhodani/49481>
 
 -   Bagge, P. (1995). Emergence and upstream flight of lotic mayflies and caddisflies (Ephemeroptera and Trichoptera) in a lake outlet, central Finland. *Entomologica Fennica*, *6*(2-3), 91–97. https://doi.org/10.33338/ef.83844
 
