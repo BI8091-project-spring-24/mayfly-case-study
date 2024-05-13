@@ -17,8 +17,22 @@ occurrences_NTNU <- rio::import(unzip(tmpfile,files="occurrence.txt",exdir = tmp
 
 # Creating presence absence for B rhodani ----
 
+# Keep occurrences with sampling methods: Kick-sampling, surber-sampling.
+# These methods are suitable in running waters, and common.
+
+print(unique(occurrences_NTNU$samplingProtocol))
+
+sampling_methods <- c("Rot (1 min)","Surber (stor)","Rot (5 min)",
+                      "Rot (1 min) x 2","Surber (liten)",
+                      "Surber dominans verdi","Surber (liten)*5 (Transekt serie)",
+                      "Rot (2 min)","Rot (1/2 min) x 2",
+                      "Rot (3 min)","R1","Rot (3 min) x 2",
+                      "Rot (2 min) x 2","Rot (1/2 min)")
+
+occurrences_NTNU <- occurrences_NTNU %>%
+  dplyr::filter(samplingProtocol %in% sampling_methods) # reduced number of occurrences from 313119 to 258105, ca 18 % removed
+
 # Sampling event level: 
-library(stringr)
 events_NTNU <- occurrences_NTNU %>%
   group_by(eventID) %>%
   dplyr::summarise(scientificNames = paste0(unique(scientificName), collapse = ", "),
@@ -27,6 +41,7 @@ events_NTNU <- occurrences_NTNU %>%
   
 events_NTNU <- events_NTNU %>%
   mutate(presence = dplyr::if_else(stringr::str_detect(scientificNames, regex("Baetis rhodani")),1,0))
+# 22444 observations (unique events)
 
 # Save file
 save(events_NTNU,file = here::here("data","derived_data","presence_absence_dataset.Rda"))

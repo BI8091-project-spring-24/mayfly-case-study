@@ -31,7 +31,7 @@ package_vec <- c("here","dplyr","knitr",
                  "ggplot2","rgbif",
                  "here", "CoordinateCleaner",
                  "terra", "sf","mapview",
-                 "PointedSDMs","INLA") # specify packages
+                 "PointedSDMs","INLA","stringr") # specify packages
 
 ## executing install & load for each package
 sapply(package_vec, install.load.package)
@@ -276,14 +276,15 @@ mapview(insectdata_buf100m, col.regions = "red")
 Dividing data into two subsets: one with known aquatic sampling and the other with unknown sampling. See script "3_spatial_filtering.R".
 
 ```{r}
-# Load spatially filtered occurrence dataset
-load(here::here("data","derived_data","insectdata_low_uncertainty_100m.rda"))
+# Presence-absence dataset ----
+# Run script
+source(here::here("code","6_presence_absence_dataset.R"))
 
-# Create subsets
-insectdata_aquatic <- 
+# Subset with presence-absence data
+load(here::here("data","derived_data","presence_absence_dataset.Rda"))
 
-insectdata_unknown <-
 
+# Occurrence-only dataset ----
 
 
 ```
