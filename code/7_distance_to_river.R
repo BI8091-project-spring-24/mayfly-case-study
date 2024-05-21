@@ -34,10 +34,13 @@ corine_2018 <- rast(here("data", "corine_2018_modified_classes.tif"))
 #elvenett_sf_P <- sf::st_transform(elvenett_sf, 32633) # UTM zone N33
 main_rivers_sf_P <- sf::st_transform(main_rivers_sf, 32633)
 
+# Aggreggate raster layer to 1km x 1km to save computing power
+aggregated_corine <- terra::aggregate(corine_2018, fact = 10, fun = max , na.rm = TRUE)
+
 # 3. CALCULATE DISTANCE FROM CENTROIDS TO NEAREST RIVER ----
 
 # Calculate centroids of each CORINE cell
-corine_centroids <- as.data.frame(xyFromCell(corine_2018, 1:ncell(corine_2018)))
+corine_centroids <- as.data.frame(xyFromCell(aggregated_corine, 1:ncell(aggregated_corine)))
 
 # Convert centroids df into spatial object
 corine_centroids_sf <- st_as_sf(corine_centroids, coords = c("x", "y"), crs = st_crs(main_rivers_sf_P))
@@ -51,7 +54,7 @@ distances <- st_distance(corine_centroids_sf, main_rivers_sf_P[nearest_river_idx
 # 4. SAVE CALCULATED DISTANCES AS NEW RASTER LAYER ----
 
 # Create new raster for the distances
-distance_raster <- corine_2018
+distance_raster <- aggregated_corine
 
 # Assign calculated distances to new raster layer
 values(distance_raster) <- as.numeric(distances)
