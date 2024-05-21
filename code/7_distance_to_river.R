@@ -14,13 +14,16 @@ library(sf)
 ## 1.1. Elvenett ----
 
 # Download data from box
-elvenett <- ("https://ntnu.box.com/shared/static/d0o69swa55oij3u0wber0gz59u6z0c82.geojson")
-download.file(elvenett, "Elv_Elvenett.geojson")
+#elvenett <- ("https://ntnu.box.com/shared/static/d0o69swa55oij3u0wber0gz59u6z0c82.geojson")
+main_rivers <- ("https://ntnu.box.com/shared/static/k8z5amhu343xwdtorbafcm0qcxug4uy3.geojson")
+#download.file(elvenett, "Elv_Elvenett.geojson")
+download.file(main_rivers, "Elv_Hovedelv.geojson")
 
 # Load river data 
   # Dataset #Elvenett" from NVE, covering all of Norway including Svalbard
   # Format: GeoJSON v1.0, Geographical coordinates WGS84 - lat long, overlapping
-elvenett_sf <- sf::read_sf(here("data","Elv_Elvenett.geojson"))
+#elvenett_sf <- sf::read_sf(here("data","Elv_Elvenett.geojson"))
+main_rivers_sf <- sf::read_sf(here("data","Elv_Hovedelv.geojson"))
 
 ## 1.2. CORINE -----
 corine_2018 <- rast(here("data", "corine_2018_modified_classes.tif"))
@@ -28,7 +31,8 @@ corine_2018 <- rast(here("data", "corine_2018_modified_classes.tif"))
 # 2. PREPARE FOR ANALYSIS ----
 
 # Change to projected coordinates
-elvenett_sf_P <- sf::st_transform(elvenett_sf, 32633) # UTM zone N33
+#elvenett_sf_P <- sf::st_transform(elvenett_sf, 32633) # UTM zone N33
+main_rivers_sf_P <- sf::st_transform(main_rivers_sf, 32633)
 
 # 3. CALCULATE DISTANCE FROM CENTROIDS TO NEAREST RIVER ----
 
@@ -36,13 +40,13 @@ elvenett_sf_P <- sf::st_transform(elvenett_sf, 32633) # UTM zone N33
 corine_centroids <- as.data.frame(xyFromCell(corine_2018, 1:ncell(corine_2018)))
 
 # Convert centroids df into spatial object
-corine_centroids_sf <- st_as_sf(corine_centroids, coords = c("x", "y"), crs = st_crs(elvenett_sf_P))
+corine_centroids_sf <- st_as_sf(corine_centroids, coords = c("x", "y"), crs = st_crs(main_rivers_sf_P))
 
 # Find nearest river segment for each centroid
-nearest_river_idx <- st_nearest_feature(corine_centroids_sf, elvenett_sf_P) # do this step first to save memory when calculating distances
+nearest_river_idx <- st_nearest_feature(corine_centroids_sf, main_rivers_sf_P) # do this step first to save memory when calculating distances
 
 # Calculate distance from centroid to nearest river segment
-distances <- st_distance(corine_centroids_sf, elvenett_sf_P[nearest_river_idx, ], by_element = TRUE)
+distances <- st_distance(corine_centroids_sf, main_rivers_sf_P[nearest_river_idx, ], by_element = TRUE)
 
 # 4. SAVE CALCULATED DISTANCES AS NEW RASTER LAYER ----
 
@@ -50,7 +54,7 @@ distances <- st_distance(corine_centroids_sf, elvenett_sf_P[nearest_river_idx, ]
 distance_raster <- corine_2018
 
 # Assign calculated distances to new raster layer
-values(distance_raster) <- min_distance
+values(distance_raster) <- as.numeric(distances)
 
 # Save the raster 
 terra::writeRaster(distance_raster, 
