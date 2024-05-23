@@ -11,7 +11,8 @@ library(terra)
 # 1. CUT BIOCLIMATIC VARIABLES TO NORWAY
 
 # Load bioclimatic variables
-bioclim1 <- rast(here("data", "wc2.1_10m_bio_1.tif"))
+bioclim10 <- rast(here("data", "wc2.1_30s_bio_10.tif"))
+bioclim11 <- rast(here("data", "wc2.1_30s_bio_11.tif"))
 
 # Download Norway country shapefile
 norway <- geodata::gadm(country = "NOR", level = 0, 
@@ -21,16 +22,21 @@ norway <- geodata::gadm(country = "NOR", level = 0,
 # Match projection of shapefile and bioclimatic variables
 projection <- "+proj=longlat +ellps=WGS84"
 norway_reprojected <- project(norway, crs(projection))
-bio1_reprojected <- project(bioclim1, crs(projection))
+bio10_reprojected <- project(bioclim10, crs(projection))
+bio11_reprojected <- project(bioclim11, crs(projection))
 
 # Check that projections match
 crs(norway_reprojected, proj = TRUE)
-crs(bio1_reprojected, proj = TRUE)
+crs(bio10_reprojected, proj = TRUE)
 
 # Cut and mask bioclimatic variables to Norway
-bio1_norway <- crop(bio1_reprojected, norway_reprojected, 
+bio10_norway <- crop(bio10_reprojected, norway_reprojected, 
                     mask = TRUE)
+bio11_norway <- crop(bio11_reprojected, norway_reprojected, 
+                     mask = TRUE)
 
 # Save the new bioclimatic variables
-terra::writeRaster(bio1_norway, 
-                   here("data", "bio1_norway.tif"))
+terra::writeRaster(bio10_norway, 
+                   here("data", "bio10_norway.tif"))
+terra::writeRaster(bio11_norway, 
+                   here("data", "bio11_norway.tif"))
