@@ -20,20 +20,29 @@ library(INLA)
 # Set options for the INLA package to use it "experimental" features
 bru_options_set(inla.mode = "experimental")
 
-# Load data in
+# Load occurrences data
 load(here("data", "cleaned_insectdata.rda"))
 
 # Define projection
 projection <- "+proj=longlat +ellps=WGS84"
 
 # Extract species occurrence records
-insect_data <- cleaned_insectdata
+presence_only <- cleaned_insectdata
+presence_absence_dataset <- read.csv(here("data", "presence_absence_dataset.csv"), header = TRUE)
 
 # Read in climate data
-bio1 <- terra::rast(here("data", "bio1_norway.tif"))
+bio10 <- terra::rast(here("data", "bio10_norway.tif"))
+bio11 <- terra::rast(here("data", "bio11_norway.tif"))
 
-# Normalize climate data by scaling it
-bio1_scaled <- scale(bio1)
+# Read in land cover and distance to river rasters
+corine2018 <- terra::rast(here("data", "corine_2018_modified_classes.tif"))
+river_distance <- terra::rast(here("data", "distance_to_river_raster.tif"))
+
+# Normalize environmental varaibles  by scaling it
+bio10_scaled <- scale(bio10)
+bio11_scaled <- scale(bio11)
+corine2018_scaled <- scale(corine2018)
+river_distance_scaled <- scale(river_distance)
 
 ## 1.2. Create mesh object ---- 
 
@@ -63,32 +72,29 @@ Mesh <- INLA::inla.mesh.2d(boundary = fm_sp2segment(Norway),
 
 ## 2.1. Prepare list with presence-only and presence-absence data ----
 
-### 2.1.1. Presence-only data ----
+# Presence-only data - keep only X and Y coordinates
+presence_only <- presence_only |>
+  filter(institutionCode != "NTNU-VM") |>
+  select(decimalLatitude, decimalLongitude) |>
+  rename(Y = decimalLatitude,
+         X = decimalLongitude)
 
-# All data coming from datasets that do not have samplingProtocol = "Rot (1 min)"
+# Presence-absence data - keep only X, Y and presence/absence columns
+presence_absence <- presence_absence_dataset |>
+  select(decimalLatitude, decimalLongitude, presence) |>
+  rename(Y = decimalLatitude,
+         X = decimalLongitude,
+         Present = presence)
 
-presence_only <- insect_data |>
-  filter(samplingProtocol != "Rot (1 min)") |>
-  select(decimalLongitude, decimalLatitude) |>
-  rename(X = decimalLongitude, Y = decimalLatitude)
-
-### 2.1.2. Presence-absence data ----
-
-# All data coming from datasets where samplingProtocol = "Rot (1 min)"
-
-# Extract records with samplingProtocol = "Rot (1 min)"
-rot_samples <- insect_data |>
-  filter(samplingProtocol == "Rot (1 min)")
-
-levels(as.factor(rot_samples$occurrenceStatus)) # no luck, they are all present => have to create our own presence absence df
-
-# Create pseudo-absences
+# Create list with the two datasets
+b_rhodani <- list(presence_absence = presence_absence,
+                presence_only = presence_only)
 
 ## 2.1. Run Integraded SDM ----
 
 # Specify model -- here we run a model with one spatial covariate and a shared spatial field
-model <- intModel(insect_data, spatialCovariates = bio1_scaled, 
-                  Coordinates = c('decimalLongitude', 'decimalLatitude'),
+model <- intModel(b_rhodani, spatialCovariates = bio10_scaled, 
+                  Coordinates = c('X', 'Y'),
                   Projection = projection, Mesh = Mesh, responsePA = 'Present')
 
 
@@ -100,13 +106,13 @@ summary(modelRun)
 
 # Create a "region" from the shape of bio1_scaled
 #get extent of raster
-bio1_extent <- terra::ext(bio1_scaled)
+bio10_extent <- terra::ext(bio10_scaled)
 #create an sf polygon from the extent
-bio1_extent_sf <- st_as_sfc(st_bbox(c(xmin = bio1_extent[1], xmax = bio1_extent[2], 
-                                      ymin = bio1_extent[3], ymax = bio1_extent[4])), 
-                            crs = st_crs(bio1_scaled))
+bio10_extent_sf <- st_as_sfc(st_bbox(c(xmin = bio10_extent[1], xmax = bio10_extent[2], 
+                                      ymin = bio10_extent[3], ymax = bio10_extent[4])), 
+                            crs = st_crs(bio10_scaled))
 #create "region" object
-region <- bio1_extent_sf
+region <- bio10_extent_sf
 
 # Create prediction plots
 predictions <- predict(modelRun, mesh = mesh,
