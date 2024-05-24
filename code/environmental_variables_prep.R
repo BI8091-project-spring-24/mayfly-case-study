@@ -10,9 +10,12 @@ library(terra)
 
 # 1. CUT BIOCLIMATIC VARIABLES TO NORWAY
 
+# Download bioclimatic variables
+bioclim <- worldclim_global(var='bio', res=30, path=here("data", "source_data"))
+
 # Load bioclimatic variables
-bioclim10 <- rast(here("data", "wc2.1_30s_bio_10.tif"))
-bioclim11 <- rast(here("data", "wc2.1_30s_bio_11.tif"))
+bioclim10 <- bioclim$wc2.1_30s_bio_10
+bioclim11 <- bioclim$wc2.1_30s_bio_11
 
 # Download Norway country shapefile
 norway <- geodata::gadm(country = "NOR", level = 0, 
