@@ -22,17 +22,18 @@ bru_options_set(inla.mode = "experimental")
 
 # Load occurrences data
 load(here("data", "cleaned_insectdata.rda"))
+load(here("data", "derived_data", "presence_absence_dataset.rda"))
 
 # Define projection
 projection <- "+proj=longlat +ellps=WGS84"
 
 # Extract species occurrence records
 presence_only <- cleaned_insectdata
-presence_absence_dataset <- read.csv(here("data", "presence_absence_dataset.csv"), header = TRUE)
+presence_absence <- presence_absence_dataset
 
 # Read in climate data
-bio10 <- terra::rast(here("data", "bio10_norway.tif"))
-bio11 <- terra::rast(here("data", "bio11_norway.tif"))
+bio10 <- terra::rast(here("data", "derived_data", "bio10_norway.tif"))
+bio11 <- terra::rast(here("data", "derived_data", "bio11_norway.tif"))
 
 # Read in land cover and distance to river rasters
 corine2018 <- terra::rast(here("data", "corine_2018_modified_classes.tif"))
@@ -87,8 +88,8 @@ presence_absence <- presence_absence_dataset |>
          Present = presence)
 
 # Create list with the two datasets
-b_rhodani <- list(presence_absence = presence_absence,
-                presence_only = presence_only)
+b_rhodani <- list(NTNU = presence_absence,
+                Gbif = presence_only)
 
 ## 2.1. Run Integraded SDM ----
 
