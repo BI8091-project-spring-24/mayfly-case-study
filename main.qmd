@@ -1,78 +1,64 @@
 ---
-title: "main document"
+title: "A practical application of the pointedSDM package (with a reproducible workflow)"
 format: html
 editor: visual
 ---
 
-# Information
+# Introduction
 
 Study: A practical application of the pointedSDM package (with a reproducible workflow).
 
-The aim of the project is to investigate how species distribution models can be used with different data types (presence-only, presence-absence, occurrence), and how the inclusion of both "good" and "less informative" data impact possible future predictions of species distribution. The R package pointedSDMs "[https://CRAN.R-project.org/package=PointedSDMs](https://cran.r-project.org/package=PointedSDMs)" by Mostert & O'hara is used for species distribution modelling. The case study will focus on the mayfly species *Baetis rhodani* , also called the Large dark olive mayfly. *B. rhodani* is commonly found in running waters all over Norway (Artsdatabanken, 2021) and can also be found in most of Western-Europe. Mayfly data is accessed through the Global Biodiversity Information Facility (GBIF, ref). Norway is selected as study area, due to the availability of both high-quality species occurrence data (NTNU University Museum) and presence-only data from national monitoring and research. Easily accessible physical, climatic and geographical data also makes Norway a good case-study.
+The aim of the project is to investigate how species distribution models can be used with different data types (presence-only, presence-absence, occurrence), and how the inclusion of both "good" and "less informative" data impact possible future predictions of species distribution. The R package pointedSDMs "[https://CRAN.R-project.org/package=PointedSDMs](https://cran.r-project.org/package=PointedSDMs)" by Mostert & O'hara is used for species distribution modelling.
 
-This file documents the different steps in the mayfly case study, created for the course Advanced biology BI8091 at NTNU, Spring 2024.
+The case study will focus on the mayfly species *Baetis rhodani* , also called the Large dark olive mayfly. Nymphs of *B. rhodani* is commonly found in running waters all over Norway (Artsdatabanken, 2021) and can also be found in most of Western-Europe. *B. rhodani* adults are winged and inhabit the terrestrial habitat for a limited time in order to reproduce. They cannot feed in their adult stage, so their life on land is short - typically lasting a few days. Not many studies have measured the dispersal distance of adult Mayflies. A study from 2021 aggregating flying distances for EPTs (Arce et al., 2021) cite only one study for *B. rhodani*, which had measured adults flying more than 3700 meters (Bagge, 1995).
+
+We assume that most of the *B. rhodani* datapoints from Norway originate from aquatic sampling, which for some datasets can be verified (ie., the NTNU University Museum) and for others inferred based on proximity to the river network. Some adult Mayfiles may also show up in the dataset. This will be handled... (add text here).
+
+Mayfly data is accessed through the Global Biodiversity Information Facility (GBIF, ref). Norway is selected as study area, due to the availability of both high-quality species occurrence data (NTNU University Museum) and presence-only data from national monitoring and research. Easily accessible physical, climatic and geographical data also makes Norway a good case-study.
+
+This file documents the different steps in the mayfly case study, created for the course Advanced biology BI8091 at NTNU, Spring 2024. The analysis consists of several steps: Selection of invertebrate datapoints, preparation of environmental variables, running the SDMs.
 
 # Setup
 
-Setup: Load needed packages, and download data. Needs to be run before the rest of the script.
+Load packages: Downloading and loading required packages using a function that checks whether each package is already downloaded, and only downloads it if not present.
 
-```{r setup}
+```{r 0_setup}
 #| output: false
 
-## Custom install & load function
-install.load.package <- function(x) {
-  if (!require(x, character.only = TRUE)) {
-    install.packages(x, repos = "http://cran.us.r-project.org")
-  }
-  require(x, character.only = TRUE)
-}
-
-package_vec <- c("here","dplyr","knitr",
-                 "ggplot2","rgbif",
-                 "here", "CoordinateCleaner",
-                 "terra", "sf","mapview",
-                 "PointedSDMs","INLA","stringr") # specify packages
-
-## executing install & load for each package
-sapply(package_vec, install.load.package)
+source(here::here("code","0_setup.R"))
 
 ```
 
-The example data in this case is *Baetis rhodani* occurrence data from GBIF. Example on how to download can be found here: "https://data-blog.gbif.org/post/downloading-long-species-lists-on-gbif/". Download criteria:
+# Load *Baetis rhodani* data from GBIF
 
--   Species: Baetis rhodani
+In this project, we use data on the mayfly *Baetis rhodani* accessed via GBIF. The GBIF infrastructure provides several options for data download, which all require a GBIF user. Creating a user is free and open for all. Searching for and downloading data can be done via the GBIF website (link here), or it can be done via R using the "rgbif" package. We will demonstrate the latter, at it improves reproducibility.
 
--   Geographic area: Norway
+First, a download request is created. Here we specify the download criteria:
+
+-   Species: Baetis rhodani (Pictet, 1843)
+
+-   Global administrative area: Norway
 
 -   Basis of record: Everything
 
 -   Year range: 1950-current
 
-Script for creating a new download request to GBIF. Only run if necessary.
+Then, the data is imported and saved as "insectdata.rda". Creating a download request from GBIF only needs to be done once. Afterwards, the dataset from the download request can be accessed directly through a download key or using a API-link. We use a download key to import the dataset.
 
-```{r new_download_request}
-# Load script: Import download
-source(here::here("code","1_1_download.R"))
-
-```
-
-Script for importing existing download request.
-
-```{r load_data}
+```{r load_GBIF_data }
 #| output: true
 #| error: true
 
-# Load script: Import download
-source(here::here("code","1_2_import_download.R"))
+# Load script: GBIF download
+# source(here::here("code","1_1_GBIF_download.R"))
+  # Script for creating a new download request to GBIF. Only run if necessary.
 
-# Download file (NB: requires you to make "data" directory beforehand)
-#download.file(mayfly_records, here("data", "insectdata.rda"))
+# Load script: GBIF import
+source(here::here("code","1_2_GBIF_import.R"))
 
-## Load data
-# load(here("data", "insectdata.rda"))
 ```
 
-# Data cleaning
+# GBIF data cleaning
 
 ## 1. Remove flagged coordinate and time records
 
@@ -208,6 +194,13 @@ load(here::here("data","derived_data","insectdata_low_uncertainty.rda"))
 
 # Data exploration
 
+The cleaned data originates from different data providers. The 10 largest data sources are shown below.
+
+```{r}
+# Add a table/figure summarizing the top-10 data sources.
+
+```
+
 Miljødirektoratet and NINA are both missing information on sampling protocol:
 
 ```{r}
@@ -241,76 +234,46 @@ ggplot() +
   theme_classic()
 ```
 
-# Analysis
+# Creating presence-absence dataset
 
-Description: The analysis consists of several steps: Selection of invertebrate datapoints, preparation of environmental variables, running the SDMs.
-
-## Selecting invertebrate datapoints
-
-To limit data points with spatial inaccuracies, we want to see how far the *Baetis rhodani* data points typically are from freshwater. The species is mainly found in running water (rivers, creeks) in its larval stages, and can cover larger distances in its terrestrial stage. The Norwegian river network (elvenett, from NVE) is therefore useful to locate suitable habitat for the species. This information will aid us in the next step, which is to limit the raster-layer used in the SDM.
-
-*How far can adult B. rhodani fly?*
-
-Not many studies have measured the dispersal distance of Mayflies. A study from 2021 aggregating flying distances for EPTs (Arce et al., 2021) cite only one study for *B. rhodani*, which had measured adults flying more than 3700 meters (Bagge, 1995).
-
-*Are most datapoints within 3700 meters from a main river?*
-
-Almost all the datapoints (5826 of 5964) were within 3700 meters from a main river (NVE hovedelv vector layer). See file "data_mapping.R" for details.
-
-*How far are known aquatic samples from the river?*
-
-By using a subset of the datapoints with known aquatic sampling methods, we want to investigate how much coordinate inaccuracies we would expect to find in aquatic sampling locations. This is useful for the data we lack sampling information on (X %). We want to filter away the datapoints that are likely terrestrial, which is assumed to be further from the river, and keep points close to the river which are likely aquatic samples.
-
-Different buffers for the river network (elvenett) were created, and spatial filtering was performed to investigate how many % of the aquatic data points that were retained. Using a 50 meter buffer was too short (coordinate inaccuracies & broad rivers not well covered), while 100 meters seem to be sufficient (capturing 83 % of data points). Code found in "data_mapping.R".
-
-Lastly, spatial filtering was performed with the 100 meter river buffer on the total insect dataset. Resulting data points are plotted below.
-
-```{r insects_100m_from_river}
-# Load data
-load(here::here("data","derived_data","insectdata_buf100m.rda"))
-# Plot points on interactive map
-mapview(insectdata_buf100m, col.regions = "red")
-
-```
-
-Dividing data into two subsets: one with known aquatic sampling and the other with unknown sampling. See script "3_spatial_filtering.R".
+The data from GBIF belongs to different datasets/data providers. Many sources do not reliably or consistently provide information about sampling structure, sampling methods etc. Therefore, such datasets will have to be treated as occurrence-only. However, for the data provided by the NTNU University Museum, there is enough information present to create a presence-absence dataset for *B. rhodani*.
 
 ```{r}
-# Presence-absence dataset ----
 # Run script
-source(here::here("code","6_presence_absence_dataset.R"))
-
-# Subset with presence-absence data
-load(here::here("data","derived_data","presence_absence_dataset.Rda"))
-
-
-# Occurrence-only dataset ----
-
-
+source(here::here("code","1_4_GBIF_presence_absence_dataset.R"))
 ```
 
-## Limit raster layer
-
-Want to only model the area of Norway which is within a suitable distance from rivers. *Baetis rhodani* adults are winged and inhabit the terrestrial habitat for a limited time in order to reproduce. They cannot feed in their adult stage, so their life on land is short - typically lasting a few days. Therefore, winged adults may have been registered in areas which are not suitable for nymphs, and we aim to exclude adult observations to improve precision of the SDM.
-
-Creating a 100 meter buffer around the "elvenett" river vector downloaded from NVE, which covers all rivers in Norway. This is then converted to a raster, with 100 x 100 meter resolution. See code "4_raster.R".
+# CORINE land cover
 
 ```{r}
-# Plot of raster layer?
 
 ```
 
-## SDMs
+# NVE distance to river
 
-Using species distribution model(s) to investigate the distribution of the mayfly species *Baetis rhodani* in Norway. The goal is to compare the performance and predictions (?) of a SDM using
+```{r}
+
+```
+
+# WORLDCLIM environmental variable
+
+```{r}
+
+```
+
+# Integrated Species Distribution Model
+
+Using species distribution models to investigate the distribution of the mayfly species *Baetis rhodani* in Norway. The goal is to compare the performance and predictions (?) of a SDM using
 
 1)  Only high-quality data from structured sampling done by NTNU University museum. For this data, we have information on species occurrence, sampling method, and number of individuals per sampling unit.
 
-2)  High quality NTNU University data as in 1, as well as lower-quality presence-only data
+2)  Only lower quality presence-only data.
+
+3)  High quality NTNU University data as in 1, as well as lower-quality presence-only data.
 
 ```{r SDMs}
 # Run SDM script(s)
-source(here::here("code","integrated_SDM.R"))
+source(here::here("code","5_integrated_SDM.R"))
 
 ```
 
