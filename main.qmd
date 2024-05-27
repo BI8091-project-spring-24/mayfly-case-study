@@ -8,15 +8,21 @@ editor: visual
 
 Study: A practical application of the pointedSDM package (with a reproducible workflow).
 
+This file documents the different steps in the mayfly case study, created for the course Advanced biology BI8091 at NTNU, Spring 2024. The analysis consists of several steps: Selection of invertebrate datapoints, preparation of environmental variables, running the SDMs and interpreting/discussing the results and possible implications.
+
+### Species distribution modelling
+
 The aim of the project is to investigate how species distribution models can be used with different data types (presence-only, presence-absence, occurrence), and how the inclusion of both "good" and "less informative" data impact possible future predictions of species distribution. The R package pointedSDMs "[https://CRAN.R-project.org/package=PointedSDMs](https://cran.r-project.org/package=PointedSDMs)" by Mostert & O'hara is used for species distribution modelling.
+
+### Study organism
 
 The case study will focus on the mayfly species *Baetis rhodani* , also called the Large dark olive mayfly. Nymphs of *B. rhodani* is commonly found in running waters all over Norway (Artsdatabanken, 2021) and can also be found in most of Western-Europe. *B. rhodani* adults are winged and inhabit the terrestrial habitat for a limited time in order to reproduce. They cannot feed in their adult stage, so their life on land is short - typically lasting a few days. Not many studies have measured the dispersal distance of adult Mayflies. A study from 2021 aggregating flying distances for EPTs (Arce et al., 2021) cite only one study for *B. rhodani*, which had measured adults flying more than 3700 meters (Bagge, 1995).
 
 We assume that most of the *B. rhodani* datapoints from Norway originate from aquatic sampling, which for some datasets can be verified (ie., the NTNU University Museum) and for others inferred based on proximity to the river network. Some adult Mayfiles may also show up in the dataset. This will be handled... (add text here).
 
-Mayfly data is accessed through the Global Biodiversity Information Facility (GBIF, ref). Norway is selected as study area, due to the availability of both high-quality species occurrence data (NTNU University Museum) and presence-only data from national monitoring and research. Easily accessible physical, climatic and geographical data also makes Norway a good case-study.
+### Data
 
-This file documents the different steps in the mayfly case study, created for the course Advanced biology BI8091 at NTNU, Spring 2024. The analysis consists of several steps: Selection of invertebrate datapoints, preparation of environmental variables, running the SDMs.
+Mayfly data is accessed through the Global Biodiversity Information Facility (GBIF, ref). Norway is selected as study area, due to the availability of both high-quality species occurrence data (NTNU University Museum) and presence-only data from national monitoring and research. Easily accessible physical, climatic and geographical data also makes Norway a good case-study.
 
 # Setup
 
@@ -181,7 +187,7 @@ save(insectdata_low_uncertainty, file= here::here("data","derived_data","insectd
 
 ```
 
-## Load cleaned datafiles.
+## Load cleaned datafiles
 
 Alternative to running all the cleaning steps.
 
@@ -194,14 +200,42 @@ load(here::here("data","derived_data","insectdata_low_uncertainty.rda"))
 
 # Data exploration
 
-The cleaned data originates from different data providers. The 10 largest data sources are shown below.
+The cleaned data originates from different data providers. The 10 largest data sources are shown below, and we see that after The University Museum (NTNU-VM), The Environment Agency (miljodir) and The Norwegian Institute for Nature Research (NINA) are the instiutions providing the highest number of datapoints.
 
 ```{r}
+# Run script
+source(here::here("code","1_4_GBIF_data_exploration.R"))
+
 # Add a table/figure summarizing the top-10 data sources.
+# knitr::include_graphics(here::here("results","top_10_institutions.jpg"))
+
+###
+# THIS SECTION WILL BE REMOVED, AND WILL JUST RUN SEPARATE SCRIPT AND USE KNITR TO ADD FIGURE (having some issues)
+
+# Summarize the number of occurrences by institution
+df_institutions <- cleaned_insectdata %>%
+  group_by(institutionCode) %>%
+  summarize(N_occurrences = length(occurrenceID))%>%
+  mutate(across(where(is.character), ~ na_if(.,""))) %>%
+  filter(!is.na(institutionCode))
+
+# Plot figure for top 10 institutions
+df_institutions_barplot <- df_institutions %>% 
+  arrange(desc(N_occurrences)) %>%
+  slice(1:10) %>%
+  ggplot(., aes(x = reorder(institutionCode,-N_occurrences), y = N_occurrences)) + 
+  geom_bar(stat = "identity") +
+  scale_x_discrete(guide = guide_axis(n.dodge = 2)) +
+  xlab("Institution") + 
+  ylab("Number of occurrences") +
+  theme_classic()
+
+df_institutions_barplot
+###
 
 ```
 
-Miljødirektoratet and NINA are both missing information on sampling protocol:
+However, both The Environment Agency and NINA are missing information on sampling protocol. They will, together with the smaller datasets, be treated as presence-only data.
 
 ```{r}
 only_mdir <- insectdata_low_uncertainty |> filter(institutionCode == "miljodir")
@@ -212,7 +246,7 @@ as.data.frame(table(only_nina$samplingProtocol))
 
 ```
 
-Plot the NINA and Mdir data:
+The *B. rhodani* data points are distributed across Norway, with higher concentrations of data points visible near large cities. We here plot the Environment Agency and NINA data:
 
 ```{r}
 ggplot() +
@@ -221,7 +255,7 @@ ggplot() +
              aes(x = decimalLongitude, y = decimalLatitude),
              colour = "darkred",
              size = 0.5) +
-  ggtitle("Only Miljodirektoratet") +
+  ggtitle("Only The Environment Agency (Miljodirektoratet)") +
   theme_classic()
 
 ggplot() +
@@ -236,7 +270,7 @@ ggplot() +
 
 # Creating presence-absence dataset
 
-The data from GBIF belongs to different datasets/data providers. Many sources do not reliably or consistently provide information about sampling structure, sampling methods etc. Therefore, such datasets will have to be treated as occurrence-only. However, for the data provided by the NTNU University Museum, there is enough information present to create a presence-absence dataset for *B. rhodani*.
+The data from GBIF belongs to different datasets/data providers. Many sources do not reliably or consistently provide information about sampling structure, sampling methods etc. Therefore, such datasets will have to be treated as occurrence-only. However, for the data provided by the NTNU University Museum, there is enough information present to create a presence-absence dataset for *B. rhodani*. We here have reliable information about sampling method, sampling duration- and area (mostly), and individual counts.
 
 ```{r}
 # Run script
