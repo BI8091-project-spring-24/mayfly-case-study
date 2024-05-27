@@ -211,6 +211,8 @@ source(here::here("code","1_4_GBIF_data_exploration.R"))
 
 ###
 # THIS SECTION WILL BE REMOVED, AND WILL JUST RUN SEPARATE SCRIPT AND USE KNITR TO ADD FIGURE (having some issues)
+# Load cleaned insectdata
+load(here::here("data","derived_data","cleaned_insectdata.rda"))
 
 # Summarize the number of occurrences by institution
 df_institutions <- cleaned_insectdata %>%
