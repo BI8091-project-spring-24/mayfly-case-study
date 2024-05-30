@@ -12,7 +12,7 @@ The present study aims to answer the following study questions:
 2.  Do Species Distribution Models (SDMs) using both types of data perform better to map the distribution of the species than single-data source SDMs?
 3.  What is the distribution of *B. rhodani* across Norway, when mean temperature of the warmest quarter and land cover are considered?
 
-![](http://www.rakkenes.com/wp-content/uploads/2017/06/0F5R8264-Edit-Edit-1030x579.jpg)
+![](http://www.rakkenes.com/wp-content/uploads/2017/06/0F5R8264-Edit-Edit-1030x579.jpg){width="555"}
 
 Image credits: rakkenes.com
 
