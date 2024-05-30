@@ -25,12 +25,15 @@ The data used in this project are:
     2.  Unstructured dataset: all occurrences of *B. rhodani* in Norwayfrom 1950 to the present day
 2.  Bioclimatic variables were downloaded from <https://worldclim.org/>
 3.  CORINE Land Cover Status rasters were downloaded from <https://land.copernicus.eu/en/products/corine-land-cover>
+4.  NVE River Network was downloaded from <https://www.nve.no/vann-og-vassdrag/hydrologiske-data/>
 
-To map the distribution of *B. rhodani* was mapped using the R package "PointedSDMs" ([https://github.com/PhilipMostert/PointedSDMs](#0))
+To map the distribution of *B. rhodani* was mapped using the R package "PointedSDMs" ([https://github.com/PhilipMostert/PointedSDMs](#0)).
 
-# Script
+All the data used as part of the analysis is accessible via download links, either directly from the data providers when possible (for both GBIF datasets and the WORLDCLIM Bioclimatic variables) or from stable data repositories (CORINE Land Cover Status rasters, NVE River Network).
 
-The analysis done as part of this project is done within the following scripts:
+## Script Structure
+
+The analysis executed as part of this project is divided into separate scripts, numbered by the order they should be run in.
 
 -   0_setup = Setup required for running the analysis
 
