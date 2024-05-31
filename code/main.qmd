@@ -1,0 +1,341 @@
+---
+title: "A practical application of the pointedSDM package (with a reproducible workflow)"
+format: html
+editor: visual
+---
+
+# Introduction
+
+Study: A practical application of the pointedSDM package (with a reproducible workflow).
+
+This file documents the different steps in the mayfly case study, created for the course Advanced biology BI8091 at NTNU, Spring 2024. The analysis consists of several steps: Selection of invertebrate datapoints, preparation of environmental variables, running the SDMs and interpreting/discussing the results and possible implications.
+
+### Species distribution modelling
+
+The aim of the project is to investigate how species distribution models can be used with different data types (presence-only, presence-absence, occurrence), and how the inclusion of both "good" and "less informative" data impact possible future predictions of species distribution. The R package pointedSDMs "[https://CRAN.R-project.org/package=PointedSDMs](https://cran.r-project.org/package=PointedSDMs)" by Mostert & O'hara is used for species distribution modelling.
+
+### Study organism
+
+The case study will focus on the mayfly species *Baetis rhodani* , also called the Large dark olive mayfly. Nymphs of *B. rhodani* is commonly found in running waters all over Norway (Artsdatabanken, 2021) and can also be found in most of Western-Europe. *B. rhodani* adults are winged and inhabit the terrestrial habitat for a limited time in order to reproduce. They cannot feed in their adult stage, so their life on land is short - typically lasting a few days. Not many studies have measured the dispersal distance of adult Mayflies. A study from 2021 aggregating flying distances for EPTs (Arce et al., 2021) cite only one study for *B. rhodani*, which had measured adults flying more than 3700 meters (Bagge, 1995).
+
+We assume that most of the *B. rhodani* datapoints from Norway originate from aquatic sampling, which for some datasets can be verified (ie., the NTNU University Museum) and for others inferred based on proximity to the river network. Some adult Mayfiles may also show up in the dataset. This will be handled... (add text here).
+
+### Data
+
+Mayfly data is accessed through the Global Biodiversity Information Facility (GBIF, ref). Norway is selected as study area, due to the availability of both high-quality species occurrence data (NTNU University Museum) and presence-only data from national monitoring and research. Easily accessible physical, climatic and geographical data also makes Norway a good case-study.
+
+# Setup
+
+Load packages: Downloading and loading required packages using a function that checks whether each package is already downloaded, and only downloads it if not present.
+
+```{r 0_setup}
+#| output: false
+
+source(here::here("code","0_setup.R"))
+
+```
+
+# Load *Baetis rhodani* data from GBIF
+
+In this project, we use data on the mayfly *Baetis rhodani* accessed via GBIF. The GBIF infrastructure provides several options for data download, which all require a GBIF user. Creating a user is free and open for all. Searching for and downloading data can be done via the GBIF website (link here), or it can be done via R using the "rgbif" package. We will demonstrate the latter, at it improves reproducibility.
+
+First, a download request is created. Here we specify the download criteria:
+
+-   Species: Baetis rhodani (Pictet, 1843)
+
+-   Global administrative area: Norway
+
+-   Basis of record: Everything
+
+-   Year range: 1950-current
+
+Then, the data is imported and saved as "insectdata.rda". Creating a download request from GBIF only needs to be done once. Afterwards, the dataset from the download request can be accessed directly through a download key or using a API-link. We use a download key to import the dataset.
+
+```{r load_GBIF_data }
+#| output: true
+#| error: true
+
+# Load script: GBIF download
+# source(here::here("code","1_1_GBIF_download.R"))
+  # Script for creating a new download request to GBIF. Only run if necessary.
+
+# Load script: GBIF import
+source(here::here("code","1_2_GBIF_import.R"))
+
+```
+
+# GBIF data cleaning
+
+## 1. Remove flagged coordinate and time records
+
+First, plot the raw coordinates to get an overview of the data:
+
+```{r plot_data}
+#| trunca: true
+
+# Download world map 
+wm <- borders("world", colour = "gray50", fill = "gray50")
+
+# Plot data to get an overview
+ggplot() +
+  coord_fixed() +
+  wm +
+  geom_point(data = insectdata,
+             aes(x = decimalLongitude, y = decimalLatitude),
+             colour = "darkred",
+             size = 0.5) +
+  theme_classic()
+
+
+
+```
+
+Then, remove records with problematic coordinates and plot the flagged records.
+
+```{r clean_coords}
+## 2.2. Remove records with problematic coordinates ----
+
+# Extract coordinate flags
+coord_flags <- clean_coordinates(x = insectdata,
+                                      lon = "decimalLongitude", 
+                                      lat = "decimalLatitude",
+                                      species = "acceptedScientificName",
+                                      test = c("centroids", "equal", "gbif", "zeros","maps"))
+
+# Get a summary of the detected flags
+summary(coord_flags) # only 3 records flagged (centroids)
+
+# Plot flagged records
+plot(coord_flags, lon = "decimalLongitude", lat = "decimalLatitude")
+
+# Exclude flagged records
+insectdata_coords <- insectdata[coord_flags$.summary, ]
+```
+
+Finally, we test for temporal outliers on the taxon level, and remove the records:
+
+```{r clean_time}
+# Test for temporal outliers on taxon level
+time_flags <- cf_age(x = insectdata_coords,
+                  lon = "decimalLongitude",
+                  lat = "decimalLatitude",
+                  taxon = "species", 
+                  min_age = "year", 
+                  max_age = "year", 
+                  value = "flagged") # Flagged 8 records
+
+# Exclude records flagged for temporal outliers
+insectdata_no_flags <- insectdata_coords[time_flags, ] 
+```
+
+## 2. Use metadata to improve data quality
+
+To improve the precision and our confidence in the data further, we can use the metadata included in the dataset.
+
+First, we make a boxplot of the coordinate precisions reported for the insect data:
+
+```{r coord_boxplot}
+# Boxplot of coordinate precision in insect data
+ggplot(insectdata_no_flags, aes(x = coordinateUncertaintyInMeters)) +
+  geom_boxplot(bins = 30, na.rm = TRUE) +
+  labs(x = "Coordinate Uncertainty (m)", y = "Frequency") +
+  theme_minimal() # A few records with relatively high coordinate uncertainty
+```
+
+Then, we calculate some summary stats for the coordinate uncertainties, make a table of each value's frequency, and inspect it:
+
+```{r coord_summary}
+mean(insectdata_no_flags$coordinateUncertaintyInMeters,
+     na.rm = TRUE) #385.518
+min(insectdata_no_flags$coordinateUncertaintyInMeters,
+    na.rm = TRUE) #0.05
+max(insectdata_no_flags$coordinateUncertaintyInMeters,
+    na.rm = TRUE) #79110
+
+# Table of frequency of each value of Coordinate Uncertainty
+value_counts <- table(insectdata_no_flags$coordinateUncertaintyInMeters)
+rmarkdown::paged_table(data.frame(value_counts))
+
+# Which Coordinate uncertainty value is most common?
+sorted_value_counts <- sort(value_counts, decreasing = TRUE)
+most_frequent_value <- names(sorted_value_counts)[1]
+most_frequent_value #1m coordinate uncertainty most frequent
+```
+
+Then, remove records with coordinate uncertainty \>3km and records with NA for coordinate uncertainty:
+
+```{r}
+
+# Remove records with coordinate uncertainty >3km and records with NA for coordinate uncertainty
+insectdata_low_uncertainty <- insectdata_no_flags |>
+  filter(coordinateUncertaintyInMeters <= 3000 | 
+           is.na(coordinateUncertaintyInMeters))
+
+# Check how many records are left
+nrow(insectdata_no_flags) #23547
+nrow(insectdata_low_uncertainty)#23516 (removed 31 records - not so bad)
+
+```
+
+Save the cleaned files. The cleaned dataset is now called insectdata_low_uncertainty (?).
+
+```{r cleaned_datafiles}
+# Save as .rda files
+save(insectdata_no_flags, file= here::here("data","derived_data","insectdata_no_flags.rda"))
+
+save(insectdata_low_uncertainty, file= here::here("data","derived_data","insectdata_low_uncertainty.rda"))
+
+```
+
+## Load cleaned datafiles
+
+Alternative to running all the cleaning steps.
+
+```{r load_cleaned_datafiles}
+load(here::here("data","derived_data","insectdata_no_flags.rda"))
+
+load(here::here("data","derived_data","insectdata_low_uncertainty.rda"))
+
+```
+
+# Data exploration
+
+The cleaned data originates from different data providers. The 10 largest data sources are shown below, and we see that after The University Museum (NTNU-VM), The Environment Agency (miljodir) and The Norwegian Institute for Nature Research (NINA) are the instiutions providing the highest number of datapoints.
+
+```{r}
+# Run script
+source(here::here("code","1_4_GBIF_data_exploration.R"))
+
+# Add a table/figure summarizing the top-10 data sources.
+# knitr::include_graphics(here::here("results","top_10_institutions.jpg"))
+
+###
+# THIS SECTION WILL BE REMOVED, AND WILL JUST RUN SEPARATE SCRIPT AND USE KNITR TO ADD FIGURE (having some issues)
+# Load cleaned insectdata
+load(here::here("data","derived_data","cleaned_insectdata.rda"))
+
+# Summarize the number of occurrences by institution
+df_institutions <- cleaned_insectdata %>%
+  group_by(institutionCode) %>%
+  summarize(N_occurrences = length(occurrenceID))%>%
+  mutate(across(where(is.character), ~ na_if(.,""))) %>%
+  filter(!is.na(institutionCode))
+
+# Plot figure for top 10 institutions
+df_institutions_barplot <- df_institutions %>% 
+  arrange(desc(N_occurrences)) %>%
+  slice(1:10) %>%
+  ggplot(., aes(x = reorder(institutionCode,-N_occurrences), y = N_occurrences)) + 
+  geom_bar(stat = "identity") +
+  scale_x_discrete(guide = guide_axis(n.dodge = 2)) +
+  xlab("Institution") + 
+  ylab("Number of occurrences") +
+  theme_classic()
+
+df_institutions_barplot
+###
+
+```
+
+However, both The Environment Agency and NINA are missing information on sampling protocol. They will, together with the smaller datasets, be treated as presence-only data.
+
+```{r}
+only_mdir <- insectdata_low_uncertainty |> filter(institutionCode == "miljodir")
+as.data.frame(table(only_mdir$samplingProtocol))
+
+only_nina <- insectdata_low_uncertainty |> filter(institutionCode == "NINA")
+as.data.frame(table(only_nina$samplingProtocol))
+
+```
+
+The *B. rhodani* data points are distributed across Norway, with higher concentrations of data points visible near large cities. We here plot the Environment Agency and NINA data:
+
+```{r}
+ggplot() +
+  coord_fixed() +
+  geom_point(data = only_mdir,
+             aes(x = decimalLongitude, y = decimalLatitude),
+             colour = "darkred",
+             size = 0.5) +
+  ggtitle("Only The Environment Agency (Miljodirektoratet)") +
+  theme_classic()
+
+ggplot() +
+  coord_fixed() +
+  geom_point(data = only_nina,
+             aes(x = decimalLongitude, y = decimalLatitude),
+             colour = "darkred",
+             size = 0.5) +
+  ggtitle("Only NINA") +
+  theme_classic()
+```
+
+# Creating presence-absence dataset
+
+The data from GBIF belongs to different datasets/data providers. Many sources do not reliably or consistently provide information about sampling structure, sampling methods etc. Therefore, such datasets will have to be treated as occurrence-only. However, for the data provided by the NTNU University Museum, there is enough information present to create a presence-absence dataset for *B. rhodani*. We here have reliable information about sampling method, sampling duration- and area (mostly), and individual counts.
+
+```{r}
+# Run script
+source(here::here("code","1_4_GBIF_presence_absence_dataset.R"))
+```
+
+# CORINE land cover
+
+```{r}
+
+```
+
+# NVE distance to river
+
+```{r}
+
+```
+
+# WORLDCLIM environmental variable
+
+```{r}
+
+```
+
+# Integrated Species Distribution Model
+
+Using species distribution models to investigate the distribution of the mayfly species *Baetis rhodani* in Norway. The goal is to compare the performance and predictions (?) of a SDM using
+
+1)  Only high-quality data from structured sampling done by NTNU University museum. For this data, we have information on species occurrence, sampling method, and number of individuals per sampling unit.
+
+2)  Only lower quality presence-only data.
+
+3)  High quality NTNU University data as in 1, as well as lower-quality presence-only data.
+
+```{r SDMs}
+# Run SDM script(s)
+source(here::here("code","5_integrated_SDM.R"))
+
+```
+
+# Citations
+
+## Literature references
+
+Manual reference list
+
+-   Alp, M., Keller, I., Westram, A. M., & Robinson, C. T. (2012). How river structure and biological traits influence gene flow: a population genetic study of two stream invertebrates with differing dispersal abilities. *Freshwater Biology*, *57*(5), 969–981. https://doi.org/10.1111/j.1365-2427.2012.02758.x
+
+-   Artsdatabanken (2021). **Vanlig smådøgnflue *Baetis rhodani* (Pictet, 1843-45).** Retrieved 13.05.2024. <https://artsdatabanken.no/Taxon/Baetis%20rhodani/49481>
+
+-   Bagge, P. (1995). Emergence and upstream flight of lotic mayflies and caddisflies (Ephemeroptera and Trichoptera) in a lake outlet, central Finland. *Entomologica Fennica*, *6*(2-3), 91–97. https://doi.org/10.33338/ef.83844
+
+-   Peredo Arce, A., Hörren, T., Schletterer, M., & Kail, J. (2021). How far can EPTs fly? A comparison of empirical flying distances of riverine invertebrates and existing dispersal metrics. *Ecological Indicators*, *125*, 107465. https://doi.org/10.1016/j.ecolind.2021.107465
+
+```{r}
+
+```
+
+## R packages
+
+Citing R and packages used, including package version.
+
+```{r}
+# Citing all packages used, including the package versions.
+report::cite_packages()
+```
