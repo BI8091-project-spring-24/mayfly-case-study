@@ -27,13 +27,13 @@ The data used in this project are:
 3.  CORINE Land Cover Status rasters were downloaded from <https://land.copernicus.eu/en/products/corine-land-cover>
 4.  NVE River Network was downloaded from <https://www.nve.no/vann-og-vassdrag/hydrologiske-data/>
 
-To map the distribution of *B. rhodani* was mapped using the R package "PointedSDMs" ([https://github.com/PhilipMostert/PointedSDMs](#0)).
+The distribution of *B. rhodani* was mapped using the R package "PointedSDMs" ([https://github.com/PhilipMostert/PointedSDMs](#0)).
 
 All the data used as part of the analysis is accessible via download links, either directly from the data providers when possible (for both GBIF datasets and the WORLDCLIM Bioclimatic variables) or from stable data repositories (CORINE Land Cover Status rasters, NVE River Network).
 
 ## Script Structure
 
-The analysis executed as part of this project is divided into separate scripts, numbered by the order they should be run in.
+The analysis executed as part of this project is divided into separate scripts, numbered by the order they should be executed in:
 
 -   0_setup = Setup required for running the analysis
 
