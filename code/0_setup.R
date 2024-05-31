@@ -28,6 +28,7 @@ sapply(package_vec, install.load.package)
 #install.packages("INLA",repos=c(getOption("repos"),INLA="https://inla.r-inla-download.org/R/stable"), dep=TRUE) 
 library("INLA")
 
+# Conditional download function, which can be used to check if a file already exists
 conditional_download <- function(url, target) {
   if (!file.exists(target)) {
     download.file(url=url, destfile=target)
