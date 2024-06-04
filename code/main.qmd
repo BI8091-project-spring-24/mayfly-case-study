@@ -12,11 +12,11 @@ Modern ecological research is increasingly coming to be characterized by the use
 
 Recent advances in species distribution modelling, exemplified with the release of the `R` package `pointedSDM` (REF), does increasingly allow for the combination of multiple species occurrence data sets with different levels of sample information (i.e. presence-only, presence-absence, counts etc), into a single integrated model (iSDM). Still, practical and actionable advice for how to best obtain, validate and prepare this differentiated data from an online repository, seems to be comparatively lacking in the literature.
 
-In this report, we aim to address this issue by demonstrating a suggestion for a complete and reproducible workflow for data download, cleaning, exploration and differentiating, from a simple GBIF query to fitting an integrated SDM with the `pointedSDM` package.
+In this report, we aim to address this issue by demonstrating a suggestion for a complete and reproducible workflow for the download, cleaning, exploration and differentiating of a species occurrence dataset, from a simple GBIF query to fitting an integrated SDM with the `pointedSDM` package.
 
 ## Case study
 
-As a case study, we will use the occurrences of the mayfly species *Beatis rhodani*, whose GBIF occurrence data in Norway is known to contain both structured and unstructured samples. In order to assess the value of our approach over more "naïve" ways of modelling the data, we will compare the output of four different SDMs: a presence-only version of our complete GBIF dataset, a presence-absence model of the subset of the data that is determined to be from structured survey, a presence-only model of the subset of the data, and an informed combination of the presence-absence and presence-only subsets of the data.
+As a case study, we will use the occurrences of the mayfly species *Baetis rhodani*, whose GBIF occurrence data in Norway is known to contain both structured and unstructured samples. In order to assess the value of our approach over more "naïve" ways of modelling the data, we will compare the output of four different SDMs: a presence-only version of our complete GBIF dataset, a presence-absence model of the subset of the data that is determined to be from structured survey, a presence-only model of the subset of the data that is presence-only, and an iSDM of the presence-absence and presence-only subsets of the data.
 
 Study: A practical application of the pointedSDM package (with a reproducible workflow).
 
@@ -30,24 +30,27 @@ The aim of the project is to investigate how species distribution models can be 
 
 The case study will focus on the mayfly species *Baetis rhodani* , also called the Large dark olive mayfly. Nymphs of *B. rhodani* is commonly found in running waters all over Norway (Artsdatabanken, 2021) and can also be found in most of Western-Europe. *B. rhodani* adults are winged and inhabit the terrestrial habitat for a limited time in order to reproduce. They cannot feed in their adult stage, so their life on land is short - typically lasting a few days. Not many studies have measured the dispersal distance of adult Mayflies. A study from 2021 aggregating flying distances for EPTs (Arce et al., 2021) cite only one study for *B. rhodani*, which had measured adults flying more than 3700 meters (Bagge, 1995).
 
-We assume that most of the *B. rhodani* datapoints from Norway originate from aquatic sampling, which for some datasets can be verified (ie., the NTNU University Museum) and for others inferred based on proximity to the river network. Some adult Mayfiles may also show up in the dataset. This will be handled... (add text here).
+We assume that most of the *B. rhodani* datapoints from Norway originate from aquatic sampling, which for some datasets can be verified (ie., the NTNU University Museum) and for others inferred based on proximity to the river network. Some adult mayfiles may also show up in the data set. This will be handled... (add text here).
 
 ### Data
 
 Mayfly data is accessed through the Global Biodiversity Information Facility (GBIF, ref). Norway is selected as study area, due to the availability of both high-quality species occurrence data (NTNU University Museum) and presence-only data from national monitoring and research. Easily accessible physical, climatic and geographical data also makes Norway a good case-study.
 
-# Setup
+## Workflow organization
+
+The workflow for this example is organized in numbered `R` scripts in the `code` folder of this repository. In the sections below,
+
+# 0. Setup
 
 Load packages: Downloading and loading required packages using a function that checks whether each package is already downloaded, and only downloads it if not present.
 
 ```{r 0_setup}
 #| output: false
 
-source(here::here("code","0_setup.R"))
-
+source("0_setup.R")
 ```
 
-# Load *Baetis rhodani* data from GBIF
+# 1. Load *Baetis rhodani* data from GBIF
 
 In this project, we use data on the mayfly *Baetis rhodani* accessed via GBIF. The GBIF infrastructure provides several options for data download, which all require a GBIF user. Creating a user is free and open for all. Searching for and downloading data can be done via the GBIF website (link here), or it can be done via R using the "rgbif" package. We will demonstrate the latter, at it improves reproducibility.
 
@@ -61,7 +64,7 @@ First, a download request is created. Here we specify the download criteria:
 
 -   Year range: 1950-current
 
-Then, the data is imported and saved as "insectdata.rda". Creating a download request from GBIF only needs to be done once. Afterwards, the dataset from the download request can be accessed directly through a download key or using a API-link. We use a download key to import the dataset.
+Then, the data is imported and saved as the file `insectdata.rda`. Creating a download request from GBIF only needs to be done once. Afterwards, the dataset from the download request can be accessed directly through a download key or using a API-link. We use a download key to import the dataset.
 
 ```{r load_GBIF_data }
 #| output: true
@@ -76,14 +79,16 @@ source(here::here("code","1_2_GBIF_import.R"))
 
 ```
 
-# GBIF data cleaning
+# 2. GBIF data cleaning
 
-## 1. Remove flagged coordinate and time records
+Before looking into the different data sources and "quality levels" of the data points in the dataset, we first clean the downloaded dataset according to (...).
+
+## 2.1. Remove flagged coordinate and time records
 
 First, plot the raw coordinates to get an overview of the data:
 
 ```{r plot_data}
-#| trunca: true
+#| truncate: true
 
 # Download world map 
 wm <- borders("world", colour = "gray50", fill = "gray50")
@@ -140,7 +145,7 @@ time_flags <- cf_age(x = insectdata_coords,
 insectdata_no_flags <- insectdata_coords[time_flags, ] 
 ```
 
-## 2. Use metadata to improve data quality
+## 2.2. Use metadata to improve data quality
 
 To improve the precision and our confidence in the data further, we can use the metadata included in the dataset.
 
@@ -313,11 +318,13 @@ source(here::here("code","1_4_GBIF_presence_absence_dataset.R"))
 
 Using species distribution models to investigate the distribution of the mayfly species *Baetis rhodani* in Norway. The goal is to compare the performance and predictions (?) of a SDM using
 
-1)  Only high-quality data from structured sampling done by NTNU University museum. For this data, we have information on species occurrence, sampling method, and number of individuals per sampling unit.
+1)  The entire dataset as presence-only data
 
-2)  Only lower quality presence-only data.
+2)  Only high-quality presence-absence coded data from structured sampling done by NTNU University museum. For this data, we have information on species occurrence, sampling method, and number of individuals per sampling unit.
 
-3)  High quality NTNU University data as in 1, as well as lower-quality presence-only data.
+3)  Only lower quality presence-only data.
+
+4)  High quality NTNU University data, as well as lower-quality presence-only data.
 
 ```{r SDMs}
 # Run SDM script(s)

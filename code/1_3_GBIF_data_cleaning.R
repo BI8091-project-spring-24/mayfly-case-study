@@ -4,25 +4,8 @@
 
 ################################################################################
 
-# 0. PACKAGES ----
-library(here)
-library(ggplot2)
-library(CoordinateCleaner)
-library(dplyr)
-library(terra)
-library(sf)
-here()
 # 1. LOAD DATA ----
 
-## 1.1. Download records from Box ----
-
-# Add download link ----
-mayfly_records <- "https://ntnu.box.com/shared/static/oky8o2cha6nek1jjexum29qqh0fk7asm.rda"
-
-# Download file (NB: requires you to make "data" directory beforehand)
-download.file(mayfly_records, here("data", "insectdata.rda"))
-
-## 1.2. Load data ----
 load(here("data", "insectdata.rda"))
 
 # 2. CLEAN GBIF RECORDS ----
