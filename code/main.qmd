@@ -6,9 +6,21 @@ editor: visual
 
 # Introduction
 
+\[alternative title suggestion: A protocol for GBIF data exploration and filtering for Integrated Species Distribution Models\]
+
+Modern ecological research is increasingly coming to be characterized by the use of large, multi-source data sets from open-access online repositories - with the infrastructure provided by the Global Biodiversity Information Facility (GBIF) as perhaps the most prominent example. These "big data" on species occurrences are often used to inform species distribution models, where \[say something more here?\]. However, the fact that the data resulting from a single GBIF query (or a similar repository) often come from widely different sources, with different levels of sampling structure, information on species absences etc., remains a challenge.
+
+Recent advances in species distribution modelling, exemplified with the release of the `R` package `pointedSDM` (REF), does increasingly allow for the combination of multiple species occurrence data sets with different levels of sample information (i.e. presence-only, presence-absence, counts etc), into a single integrated model (iSDM). Still, practical and actionable advice for how to best obtain, validate and prepare this differentiated data from an online repository, seems to be comparatively lacking in the literature.
+
+In this report, we aim to address this issue by demonstrating a suggestion for a complete and reproducible workflow for data download, cleaning, exploration and differentiating, from a simple GBIF query to fitting an integrated SDM with the `pointedSDM` package.
+
+## Case study
+
+As a case study, we will use the occurrences of the mayfly species *Beatis rhodani*, whose GBIF occurrence data in Norway is known to contain both structured and unstructured samples. In order to assess the value of our approach over more "naïve" ways of modelling the data, we will compare the output of four different SDMs: a presence-only version of our complete GBIF dataset, a presence-absence model of the subset of the data that is determined to be from structured survey, a presence-only model of the subset of the data, and an informed combination of the presence-absence and presence-only subsets of the data.
+
 Study: A practical application of the pointedSDM package (with a reproducible workflow).
 
-This file documents the different steps in the mayfly case study, created for the course Advanced biology BI8091 at NTNU, Spring 2024. The analysis consists of several steps: Selection of invertebrate datapoints, preparation of environmental variables, running the SDMs and interpreting/discussing the results and possible implications.
+This report documents the different steps in the mayfly case study, created for the course Advanced biology BI8091 at NTNU, Spring 2024. The analysis consists of several steps: Selection of invertebrate data points, preparation of environmental variables, running the SDMs and interpreting/discussing the results and possible implications.
 
 ### Species distribution modelling
 
@@ -319,11 +331,11 @@ source(here::here("code","5_integrated_SDM.R"))
 
 Manual reference list
 
--   Alp, M., Keller, I., Westram, A. M., & Robinson, C. T. (2012). How river structure and biological traits influence gene flow: a population genetic study of two stream invertebrates with differing dispersal abilities. *Freshwater Biology*, *57*(5), 969–981. https://doi.org/10.1111/j.1365-2427.2012.02758.x
+-   Alp, M., Keller, I., Westram, A. M., & Robinson, C. T. (2012). How river structure and biological traits influence gene flow: a population genetic study of two stream invertebrates with differing dispersal abilities. *Freshwater Biology*, *57*(5), 969--981. https://doi.org/10.1111/j.1365-2427.2012.02758.x
 
 -   Artsdatabanken (2021). **Vanlig smådøgnflue *Baetis rhodani* (Pictet, 1843-45).** Retrieved 13.05.2024. <https://artsdatabanken.no/Taxon/Baetis%20rhodani/49481>
 
--   Bagge, P. (1995). Emergence and upstream flight of lotic mayflies and caddisflies (Ephemeroptera and Trichoptera) in a lake outlet, central Finland. *Entomologica Fennica*, *6*(2-3), 91–97. https://doi.org/10.33338/ef.83844
+-   Bagge, P. (1995). Emergence and upstream flight of lotic mayflies and caddisflies (Ephemeroptera and Trichoptera) in a lake outlet, central Finland. *Entomologica Fennica*, *6*(2-3), 91--97. https://doi.org/10.33338/ef.83844
 
 -   Peredo Arce, A., Hörren, T., Schletterer, M., & Kail, J. (2021). How far can EPTs fly? A comparison of empirical flying distances of riverine invertebrates and existing dispersal metrics. *Ecological Indicators*, *125*, 107465. https://doi.org/10.1016/j.ecolind.2021.107465
 
