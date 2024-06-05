@@ -6,7 +6,7 @@
 
 # 1. LOAD DATA ----
 
-load(here("data", "insectdata.rda"))
+load(here("data", "source_data", "insectdata.rda"))
 
 # 2. CLEAN GBIF RECORDS ----
 
@@ -16,7 +16,7 @@ load(here("data", "insectdata.rda"))
 wm <- borders("world", colour = "gray50", fill = "gray50")
 
 # Plot data to get an overview
-ggplot() +
+plot_row <- ggplot() +
   coord_fixed() +
   wm +
   geom_point(data = insectdata,
@@ -38,7 +38,7 @@ coord_flags <- clean_coordinates(x = insectdata,
 summary(coord_flags) # only 3 records flagged (centroids)
 
 # Plot flagged records
-plot(coord_flags, lon = "decimalLongitude", lat = "decimalLatitude")
+plot_flags <- plot(coord_flags, lon = "decimalLongitude", lat = "decimalLatitude")
 
 # Exclude flagged records
 insectdata_coords <- insectdata[coord_flags$.summary, ]
@@ -62,7 +62,7 @@ insectdata_no_flags <- insectdata_coords[time_flags, ]
 ## 3.1. Coordinate precision ----
 
 # Boxplot of coordinate precision in insect data
-ggplot(insectdata_no_flags, aes(x = coordinateUncertaintyInMeters)) +
+coord_precision <- ggplot(insectdata_no_flags, aes(x = coordinateUncertaintyInMeters)) +
   geom_boxplot(bins = 30, na.rm = TRUE) +
   labs(x = "Coordinate Uncertainty (m)", y = "Frequency") +
   theme_minimal() # A few records with relatively high coordinate uncertainty
@@ -77,7 +77,7 @@ max(insectdata_no_flags$coordinateUncertaintyInMeters,
 
 # Table of frequency of each value of Coordinate Uncertainty
 value_counts <- table(insectdata_no_flags$coordinateUncertaintyInMeters)
-View(value_counts)
+#View(value_counts)
 
 # Which Coordinate uncertainty value is most common?
 sorted_value_counts <- sort(value_counts, decreasing = TRUE)
@@ -135,5 +135,6 @@ out.round <- cd_round(insectdata_cleaned_count, lon = "decimalLongitude",
 
 # Save cleaned df
 cleaned_insectdata <- insectdata_cleaned_count
+dir.create("data/derived_data", showWarnings = FALSE)
 save(cleaned_insectdata, file = here("data","derived_data","cleaned_insectdata.rda"))
 

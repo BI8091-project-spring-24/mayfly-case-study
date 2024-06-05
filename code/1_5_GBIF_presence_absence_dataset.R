@@ -9,11 +9,14 @@
 # Searched for the dataset in GBIF, create a download request, date 22.04.024
 
 # GBIF download
-download_url <- "https://api.gbif.org/v1/occurrence/download/request/0200986-240321170329656.zip"
-tmpfile <- tempfile()
-tmpdir <- tempdir()
-download.file(download_url,tmpfile)
-occurrences_NTNU <- rio::import(unzip(tmpfile,files="occurrence.txt",exdir = tmpdir), encoding = "UTF-8") # on the fly unzip and import to R object 
+datset_key <- unique(only_ntnu$datasetKey)[2] # skip empty name
+occurrences_NTNU_download <- rgbif::occ_download(
+  pred("datasetKey", datset_key),
+  pred("gadm", "NOR"), # Norway
+  pred_gte("year", 1950)) # on the fly unzip and import to R object 
+
+occ_download_wait(occurrences_NTNU)
+
 
 # Creating presence absence for B rhodani ----
 
@@ -22,9 +25,13 @@ occurrences_NTNU <- rio::import(unzip(tmpfile,files="occurrence.txt",exdir = tmp
 
 print(unique(occurrences_NTNU$samplingProtocol))
 
-sampling_methods <- c("Rot (1 min)","Surber (stor)","Rot (5 min)",
-                      "Rot (1 min) x 2","Surber (liten)",
-                      "Surber dominans verdi","Surber (liten)*5 (Transekt serie)",
+sampling_methods <- c("Rot (1 min)",
+                      "Surber (stor)",
+                      "Rot (5 min)",
+                      "Rot (1 min) x 2",
+                      "Surber (liten)",
+                      "Surber dominans verdi",
+                      "Surber (liten)*5 (Transekt serie)",
                       "Rot (2 min)","Rot (1/2 min) x 2",
                       "Rot (3 min)","R1","Rot (3 min) x 2",
                       "Rot (2 min) x 2","Rot (1/2 min)")

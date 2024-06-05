@@ -13,4 +13,5 @@ insectdata <- occ_download_get("0058633-231120084113126") %>%
   occ_download_import()
 
 # Save file
+dir.create("data/source_data", showWarnings = FALSE)
 save(insectdata, file = here::here("data","source_data","insectdata.rda"))

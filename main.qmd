@@ -18,6 +18,8 @@ In this report, we aim to address this issue by demonstrating a suggestion for a
 
 As a case study, we will use the occurrences of the mayfly species *Baetis rhodani*, whose GBIF occurrence data in Norway is known to contain both structured and unstructured samples. In order to assess the value of our approach over more "naïve" ways of modelling the data, we will compare the output of four different SDMs: a presence-only version of our complete GBIF dataset, a presence-absence model of the subset of the data that is determined to be from structured survey, a presence-only model of the subset of the data that is presence-only, and an iSDM of the presence-absence and presence-only subsets of the data.
 
+### \[Original intro\]
+
 Study: A practical application of the pointedSDM package (with a reproducible workflow).
 
 This report documents the different steps in the mayfly case study, created for the course Advanced biology BI8091 at NTNU, Spring 2024. The analysis consists of several steps: Selection of invertebrate data points, preparation of environmental variables, running the SDMs and interpreting/discussing the results and possible implications.
@@ -47,7 +49,7 @@ Load packages: Downloading and loading required packages using a function that c
 ```{r 0_setup}
 #| output: false
 
-source("0_setup.R")
+source("code/0_setup.R")
 ```
 
 # 1. Load *Baetis rhodani* data from GBIF
@@ -81,69 +83,60 @@ source(here::here("code","1_2_GBIF_import.R"))
 
 # 2. GBIF data cleaning
 
-Before looking into the different data sources and "quality levels" of the data points in the dataset, we first clean the downloaded dataset according to (...).
+Before looking into the different sources and "quality levels" of the data, in the dataset, we first clean the downloaded dataset: removing data points with flagged coordinates, temporal outliers, and low coordinate precision (\>1km). The full cleaning procedure is provided in more detail in the script `1_3_GBIF_data_cleaning.R`.
+
+```{r run-cleaning}
+source(here::here("code","1_3_GBIF_data_cleaning.R"))
+
+```
 
 ## 2.1. Remove flagged coordinate and time records
 
 First, plot the raw coordinates to get an overview of the data:
 
-```{r plot_data}
+```{r plot_maps}
+#| label: fig-coords
+#| layout-ncol: 2
+#| fig-cap: "Coordinates for the raw and cleaned occurnces of B. Rhodani in Norway"
+#| fig-subcap: 
+#|   - "Raw coordinate data ($N=23558$)."
+#|   - "Cleaned coordinate data ($N=23434$)."
 #| truncate: true
 
 # Download world map 
-wm <- borders("world", colour = "gray50", fill = "gray50")
 
-# Plot data to get an overview
+
+# Plot raw data
 ggplot() +
   coord_fixed() +
-  wm +
+  borders(database="world",
+          regions="Norway(?!:Svalbard)", colour = "gray50", fill = "gray90",
+          xlim=c(4.5, 32)) +
   geom_point(data = insectdata,
              aes(x = decimalLongitude, y = decimalLatitude),
              colour = "darkred",
              size = 0.5) +
+  coord_quickmap() +
   theme_classic()
 
-
+# Plot cleaned data
+ggplot() +
+  coord_fixed() +
+  borders(database="world",
+          regions="Norway(?!:Svalbard)", colour = "gray50", fill = "gray90",
+          xlim=c(4.5, 32)) +
+  geom_point(data = cleaned_insectdata,
+             aes(x = decimalLongitude, y = decimalLatitude),
+             colour = "darkblue",
+             size = 0.5) +
+  coord_quickmap() +
+  theme_classic()
 
 ```
 
 Then, remove records with problematic coordinates and plot the flagged records.
 
-```{r clean_coords}
-## 2.2. Remove records with problematic coordinates ----
-
-# Extract coordinate flags
-coord_flags <- clean_coordinates(x = insectdata,
-                                      lon = "decimalLongitude", 
-                                      lat = "decimalLatitude",
-                                      species = "acceptedScientificName",
-                                      test = c("centroids", "equal", "gbif", "zeros","maps"))
-
-# Get a summary of the detected flags
-summary(coord_flags) # only 3 records flagged (centroids)
-
-# Plot flagged records
-plot(coord_flags, lon = "decimalLongitude", lat = "decimalLatitude")
-
-# Exclude flagged records
-insectdata_coords <- insectdata[coord_flags$.summary, ]
-```
-
 Finally, we test for temporal outliers on the taxon level, and remove the records:
-
-```{r clean_time}
-# Test for temporal outliers on taxon level
-time_flags <- cf_age(x = insectdata_coords,
-                  lon = "decimalLongitude",
-                  lat = "decimalLatitude",
-                  taxon = "species", 
-                  min_age = "year", 
-                  max_age = "year", 
-                  value = "flagged") # Flagged 8 records
-
-# Exclude records flagged for temporal outliers
-insectdata_no_flags <- insectdata_coords[time_flags, ] 
-```
 
 ## 2.2. Use metadata to improve data quality
 
@@ -217,53 +210,28 @@ load(here::here("data","derived_data","insectdata_low_uncertainty.rda"))
 
 # Data exploration
 
-The cleaned data originates from different data providers. The 10 largest data sources are shown below, and we see that after The University Museum (NTNU-VM), The Environment Agency (miljodir) and The Norwegian Institute for Nature Research (NINA) are the instiutions providing the highest number of datapoints.
+The cleaned data originates from different data providers. The 10 largest data sources are shown below, and we see that after The NTNU University Museum (NTNU-VM), The Norwegian Environmental Agency (miljodir) and The Norwegian Institute for Nature Research (NINA) are the institutions providing the highest number of data points.
 
 ```{r}
 # Run script
 source(here::here("code","1_4_GBIF_data_exploration.R"))
 
-# Add a table/figure summarizing the top-10 data sources.
-# knitr::include_graphics(here::here("results","top_10_institutions.jpg"))
+# plot table
 
-###
-# THIS SECTION WILL BE REMOVED, AND WILL JUST RUN SEPARATE SCRIPT AND USE KNITR TO ADD FIGURE (having some issues)
-# Load cleaned insectdata
-load(here::here("data","derived_data","cleaned_insectdata.rda"))
 
-# Summarize the number of occurrences by institution
-df_institutions <- cleaned_insectdata %>%
-  group_by(institutionCode) %>%
-  summarize(N_occurrences = length(occurrenceID))%>%
-  mutate(across(where(is.character), ~ na_if(.,""))) %>%
-  filter(!is.na(institutionCode))
-
-# Plot figure for top 10 institutions
-df_institutions_barplot <- df_institutions %>% 
-  arrange(desc(N_occurrences)) %>%
-  slice(1:10) %>%
-  ggplot(., aes(x = reorder(institutionCode,-N_occurrences), y = N_occurrences)) + 
-  geom_bar(stat = "identity") +
-  scale_x_discrete(guide = guide_axis(n.dodge = 2)) +
-  xlab("Institution") + 
-  ylab("Number of occurrences") +
-  theme_classic()
-
-df_institutions_barplot
-###
+# plot barplot
+#df_institutions_barplot
 
 ```
 
 However, both The Environment Agency and NINA are missing information on sampling protocol. They will, together with the smaller datasets, be treated as presence-only data.
 
 ```{r}
-only_mdir <- insectdata_low_uncertainty |> filter(institutionCode == "miljodir")
-as.data.frame(table(only_mdir$samplingProtocol))
 
-only_nina <- insectdata_low_uncertainty |> filter(institutionCode == "NINA")
-as.data.frame(table(only_nina$samplingProtocol))
 
 ```
+
+By comparison, the NTNU University Museum provides sampling protocold for nearly all samples.
 
 The *B. rhodani* data points are distributed across Norway, with higher concentrations of data points visible near large cities. We here plot the Environment Agency and NINA data:
 
@@ -291,9 +259,15 @@ ggplot() +
 
 The data from GBIF belongs to different datasets/data providers. Many sources do not reliably or consistently provide information about sampling structure, sampling methods etc. Therefore, such datasets will have to be treated as occurrence-only. However, for the data provided by the NTNU University Museum, there is enough information present to create a presence-absence dataset for *B. rhodani*. We here have reliable information about sampling method, sampling duration- and area (mostly), and individual counts.
 
+In order to extract information on the absences of B. rhodani in the University museum dataset, we need the full dataset from the museum. This can be identified from the `datasetKey` column of the
+
+to trace our occurrences
+
+To do this, however, we need to
+
 ```{r}
 # Run script
-source(here::here("code","1_4_GBIF_presence_absence_dataset.R"))
+#source(here::here("code","1_4_GBIF_presence_absence_dataset.R"))
 ```
 
 # CORINE land cover
@@ -328,7 +302,7 @@ Using species distribution models to investigate the distribution of the mayfly 
 
 ```{r SDMs}
 # Run SDM script(s)
-source(here::here("code","5_integrated_SDM.R"))
+#source(here::here("code","5_integrated_SDM.R"))
 
 ```
 
