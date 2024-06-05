@@ -42,7 +42,9 @@ Mayfly data is accessed through the Global Biodiversity Information Facility (GB
 
 The workflow for this example is organized in numbered `R` scripts in the `code` folder of this repository. In the sections below,
 
-# 0. Setup
+# Workflow
+
+## 0. Setup
 
 Load packages: Downloading and loading required packages using a function that checks whether each package is already downloaded, and only downloads it if not present.
 
@@ -52,7 +54,7 @@ Load packages: Downloading and loading required packages using a function that c
 source("code/0_setup.R")
 ```
 
-# 1. Load *Baetis rhodani* data from GBIF
+## 1. Load *Baetis rhodani* data from GBIF
 
 In this project, we use data on the mayfly *Baetis rhodani* accessed via GBIF. The GBIF infrastructure provides several options for data download, which all require a GBIF user. Creating a user is free and open for all. Searching for and downloading data can be done via the GBIF website (link here), or it can be done via R using the "rgbif" package. We will demonstrate the latter, at it improves reproducibility.
 
@@ -81,7 +83,7 @@ source(here::here("code","1_2_GBIF_import.R"))
 
 ```
 
-# 2. GBIF data cleaning
+## 2. GBIF data cleaning
 
 Before looking into the different sources and "quality levels" of the data, in the dataset, we first clean the downloaded dataset: removing data points with flagged coordinates, temporal outliers, and low coordinate precision (\>1km). The full cleaning procedure is provided in more detail in the script `1_3_GBIF_data_cleaning.R`.
 
@@ -138,7 +140,7 @@ ggplot() +
 
 ```
 
-# Data exploration
+## 3. Data exploration
 
 The cleaned data originates from different data providers. The 10 largest data sources are shown below in @fig-institutions-bar, and we see that after The NTNU University Museum (NTNU-VM), The Norwegian Environmental Agency (miljodir) and The Norwegian Institute for Nature Research (NINA) are the institutions providing the highest number of data points.
 
@@ -183,25 +185,35 @@ ggplot() +
 
 Another striking feature of the data, is the fact that NTNU university museum samples seem to be heavily localized in middle / northern Norway, while the two other data sets are more evenly distributed across the country, with the exception of the northernmost Finnmark region, where the sampling effort is low for all data sets.
 
-# Creating presence-absence dataset
+## 4. Creating presence-absence dataset
 
-From inspecting the cleaned dataset, we see that both the Environmental Agency and NINA are missing information on sampling protocol. By comparison, the NTNU University Museum provides a sampling protocol for nearly all samples (14173 out of 14184 occurrences).
+From inspecting the cleaned dataset, we see that both the Environmental Agency and NINA are missing information on the sampling protocol. By comparison, the NTNU University Museum provides reliable information about the sampling method for nearly all samples (14173 of 14184 occurrences), sampling duration- and area (mostly), as well as individual counts, sampling duration- and area (mostly), and individual counts.
 
-On the basis of this,
+On the basis of this, we propose that the Environmental Agency and NINA data, together with the data from smaller providers, be treated as presence-only date, while the NTNU University Museum dataset has enough structure for us to construct a presence-absence dataset, given comparable samples taken with the same protocol where *B. rhodani* is absent.
 
-They will, together with the smaller datasets, be treated as presence-only data.
+In order to find these, we can look at the `datasetKey` column in the dataset, and make a new GBIF request based on that. As it turns out, nearly all the samples from the NTNU Science Museum originate from a single dataset, the [Freshwater benthic invertebrates ecological collection](https://www.gbif.org/dataset/33591b80-0e31-480c-82ce-2f57211b10e6), which contain data on \[more info here\].
+
+We created a new download request with the same parameters as in 1.1., and filtered it to only contain samples obtained with sampling methods suitable for catching B. rhodani
+
+be identified from the `datasetKey` column of the
 
 The data from GBIF belongs to different datasets/data providers. Many sources do not reliably or consistently provide information about sampling structure, sampling methods etc. Therefore, such datasets will have to be treated as occurrence-only. However, for the data provided by the NTNU University Museum, there is enough information present to create a presence-absence dataset for *B. rhodani*. We here have reliable information about sampling method, sampling duration- and area (mostly), and individual counts.
 
-In order to extract information on the absences of B. rhodani in the University museum dataset, we need the full dataset from the museum. This can be identified from the `datasetKey` column of the
-
-to trace our occurrences
-
-To do this, however, we need to
-
 ```{r}
 # Run script
-#source(here::here("code","1_4_GBIF_presence_absence_dataset.R"))
+load("data/derived_data/presence_absence_dataset.Rda")
+
+ggplot() +
+    coord_fixed() +
+    borders(database="world",
+            regions="Norway(?!:Svalbard)", colour = "gray70", fill = "gray90",
+            xlim=c(4.5, 32)) +
+    geom_point(data = events_NTNU,
+               aes(x = as.numeric(decimalLongitude), y = as.numeric(decimalLatitude),
+               colour = as.factor(presence)),
+               size = 0.5) + 
+  coord_quickmap() + 
+  theme_minimal()
 ```
 
 # CORINE land cover

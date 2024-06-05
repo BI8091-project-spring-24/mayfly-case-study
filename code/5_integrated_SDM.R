@@ -4,15 +4,6 @@
 
 ################################################################################
 
-# 0. PACKAGES ----
-library(here)
-library(dplyr)
-library(terra)
-library(sf)
-library(giscoR)
-library(PointedSDMs)
-library(INLA)
-
 # 1. PREPARE DATA FOR POINTEDSDMS ----
 
 ## 1.1. Load data ----
@@ -21,7 +12,7 @@ library(INLA)
 bru_options_set(inla.mode = "experimental")
 
 # Load occurrences data
-load(here("data", "cleaned_insectdata.rda"))
+load(here("data", "derived_data", "cleaned_insectdata.rda"))
 load(here("data", "derived_data", "presence_absence_dataset.rda"))
 
 # Define projection
@@ -29,17 +20,17 @@ projection <- "+proj=longlat +ellps=WGS84"
 
 # Extract species occurrence records
 presence_only <- cleaned_insectdata
-presence_absence <- presence_absence_dataset
+presence_absence <- events_NTNU
 
 # Read in climate data
 bio10 <- terra::rast(here("data", "derived_data", "bio10_norway.tif"))
 bio11 <- terra::rast(here("data", "derived_data", "bio11_norway.tif"))
 
 # Read in land cover and distance to river rasters
-corine2018 <- terra::rast(here("data", "corine_2018_modified_classes.tif"))
+corine2018 <- terra::rast(here("data", "derived_data", "corine_2018_modified_classes.tif"))
 river_distance <- terra::rast(here("data", "distance_to_river_raster.tif"))
 
-# Normalize environmental varaibles  by scaling it
+# Normalize environmental variables  by scaling it
 bio10_scaled <- scale(bio10)
 bio11_scaled <- scale(bio11)
 corine2018_scaled <- scale(corine2018)
@@ -48,7 +39,6 @@ river_distance_scaled <- scale(river_distance)
 ## 1.2. Create mesh object ---- 
 
 # Credits for code: Philip Mostert
-
 # Set CRS
 CRS <- '+proj=utm +zone=32 +ellps=WGS84 +datum=WGS84 +units=km +no_defs'
 
@@ -74,11 +64,19 @@ Mesh <- INLA::inla.mesh.2d(boundary = fm_sp2segment(Norway),
 ## 2.1. Prepare list with presence-only and presence-absence data ----
 
 # Presence-only data - keep only X and Y coordinates
-presence_only <- presence_only |>
+presence_only_full <- presence_only |>
+  #filter(institutionCode != "NTNU-VM") |>
+  select(decimalLatitude, decimalLongitude) |>
+  rename(Y = decimalLatitude,
+         X = decimalLongitude)
+
+presence_only_no_vm <- presence_only |>
   filter(institutionCode != "NTNU-VM") |>
   select(decimalLatitude, decimalLongitude) |>
   rename(Y = decimalLatitude,
          X = decimalLongitude)
+
+
 
 # Presence-absence data - keep only X, Y and presence/absence columns
 presence_absence <- presence_absence_dataset |>
@@ -94,13 +92,27 @@ b_rhodani <- list(NTNU = presence_absence,
 ## 2.1. Run Integraded SDM ----
 
 # Specify model -- here we run a model with one spatial covariate and a shared spatial field
-model <- intModel(b_rhodani, spatialCovariates = bio10_scaled, 
+model_po_full <- intModel(presence_only_full, spatialCovariates = bio10_scaled, 
                   Coordinates = c('X', 'Y'),
                   Projection = projection, Mesh = Mesh, responsePA = 'Present')
 
+# only presence-only
+model_po_partial <- intModel(presence_only_no_vm, spatialCovariates = bio10_scaled, 
+                  Coordinates = c('X', 'Y'),
+                  Projection = projection, Mesh = Mesh, responsePA = 'Present')
+
+model_pa_only <- intModel(presence_absence, spatialCovariates = bio10_scaled, 
+                             Coordinates = c('X', 'Y'),
+                             Projection = projection, Mesh = Mesh, responsePA = 'Present')
+
+model_integrated <- intModel(b_rhodani, spatialCovariates = bio10_scaled, 
+                             Coordinates = c('X', 'Y'),
+                             Projection = projection, Mesh = Mesh, responsePA = 'Present')
+
+
 
 # Run integrated model
-modelRun <- fitISDM(model, options = list(control.inla = list(int.strategy = 'eb'), 
+modelRun <- fitISDM(model_po_small, options = list(control.inla = list(int.strategy = 'eb'), 
                                           safe = TRUE))
 # Extract summary of the model
 summary(modelRun)
@@ -109,15 +121,15 @@ summary(modelRun)
 #get extent of raster
 bio10_extent <- terra::ext(bio10_scaled)
 #create an sf polygon from the extent
-bio10_extent_sf <- st_as_sfc(st_bbox(c(xmin = bio10_extent[1], xmax = bio10_extent[2], 
-                                      ymin = bio10_extent[3], ymax = bio10_extent[4])), 
+bio10_extent_sf <- st_as_sfc(st_bbox(c(bio10_extent[1], bio10_extent[2], 
+                                       bio10_extent[3], bio10_extent[4])), 
                             crs = st_crs(bio10_scaled))
 #create "region" object
 region <- bio10_extent_sf
 
 # Create prediction plots
-predictions <- predict(modelRun, mesh = mesh,
-                       mask = region, 
+predictions <- predict(modelRun, mesh = Mesh,
+                       mask = Norway, 
                        spatial = TRUE,
                        fun = 'linear')
 

@@ -4,21 +4,16 @@
 
 ################################################################################
 
-# 0. PACKAGES ----
-library(here)
-library(terra)
-library(dplyr)
-
 # 1. LOAD CORINE 2018 STATUS LAYER ----
 
 # Add download link
 U2018_CLC2018_V2020_20u1 <- ("https://ntnu.box.com/shared/static/iub514rfjnkopg3nu4nc18j4axq5jfon.tif")
 
 # Download the file
-download.file(U2018_CLC2018_V2020_20u1, "U2018_CLC2018_V2020_20u1.tif")
+conditional_download(U2018_CLC2018_V2020_20u1, "data/source_data/U2018_CLC2018_V2020_20u1.tif")
 
 # Read in the layer
-corine_2018 <- rast(here("data", "U2018_CLC2018_V2020_20u1.tif"))
+corine_2018 <- rast(here("data", "source_data", "U2018_CLC2018_V2020_20u1.tif"))
 
 # 2. CUT AND MASK CORINE LAYER TO NORWAY ----
 
@@ -48,8 +43,9 @@ norway_corine_2018 <- crop(corine_2018, norway_corine_projection,
 
 ## 2.4. Save cropped layer ----
 terra::writeRaster(norway_corine_2018,
-                   here("data", "norway_corine_2018.tif"),
+                   here("data", "derived_data", "norway_corine_2018.tif"),
                    overwrite = TRUE)
+
 
 # 3. CHANGE COVER LAYER VALUES ----
 
@@ -103,5 +99,6 @@ norway_corine_modified <- app(norway_corine_modified,
 
 # Save the modified corine stack 
 terra::writeRaster(norway_corine_modified,
-                   here("data", "corine_2018_modified_classes.tif"),
+                   here("data", "derived_data", "corine_2018_modified_classes.tif"),
                    overwrite = TRUE)
+

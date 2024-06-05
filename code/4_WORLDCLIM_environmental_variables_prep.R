@@ -11,7 +11,8 @@ library(terra)
 # 1. CUT BIOCLIMATIC VARIABLES TO NORWAY
 
 # Download bioclimatic variables
-bioclim <- worldclim_global(var='bio', res=30, path=here("data", "source_data"))
+bioclim <- worldclim_country(var='bio', res=0.5, path=here("data", "source_data"),
+                            country="Norway")
 
 # Load bioclimatic variables
 bioclim10 <- bioclim$wc2.1_30s_bio_10
@@ -40,6 +41,7 @@ bio11_norway <- crop(bio11_reprojected, norway_reprojected,
 
 # Save the new bioclimatic variables
 terra::writeRaster(bio10_norway, 
-                   here("data", "bio10_norway.tif"))
+                   here("data", "derived_data", "bio10_norway.tif"))
 terra::writeRaster(bio11_norway, 
-                   here("data", "bio11_norway.tif"))
+                   here("data", "derived_data", "bio11_norway.tif"))
+
