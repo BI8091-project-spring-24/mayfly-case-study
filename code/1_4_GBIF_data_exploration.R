@@ -24,7 +24,6 @@ df_institutions_barplot <- df_institutions %>%
   ylab("Number of occurrences") +
   theme_classic()
 
-a <-table(cleaned_insectdata$samplingProtocol)
 
 only_mdir <- insectdata_low_uncertainty |> filter(institutionCode == "miljodir")
 as.data.frame(table(only_mdir$samplingProtocol))

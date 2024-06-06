@@ -28,7 +28,7 @@ bio11 <- terra::rast(here("data", "derived_data", "bio11_norway.tif"))
 
 # Read in land cover and distance to river rasters
 corine2018 <- terra::rast(here("data", "derived_data", "corine_2018_modified_classes.tif"))
-river_distance <- terra::rast(here("data", "distance_to_river_raster.tif"))
+#river_distance <- terra::rast(here("data", "distance_to_river_raster.tif"))
 
 # Normalize environmental variables  by scaling it
 bio10_scaled <- scale(bio10)
@@ -92,30 +92,52 @@ b_rhodani <- list(NTNU = presence_absence,
 ## 2.1. Run Integraded SDM ----
 
 # Specify model -- here we run a model with one spatial covariate and a shared spatial field
+
+# all data as presence-only
 model_po_full <- intModel(presence_only_full, spatialCovariates = bio10_scaled, 
                   Coordinates = c('X', 'Y'),
                   Projection = projection, Mesh = Mesh, responsePA = 'Present')
 
-# only presence-only
+# only presence-only not from VM
 model_po_partial <- intModel(presence_only_no_vm, spatialCovariates = bio10_scaled, 
                   Coordinates = c('X', 'Y'),
                   Projection = projection, Mesh = Mesh, responsePA = 'Present')
 
+# only presence-absence from VM
 model_pa_only <- intModel(presence_absence, spatialCovariates = bio10_scaled, 
                              Coordinates = c('X', 'Y'),
                              Projection = projection, Mesh = Mesh, responsePA = 'Present')
 
+# integrated model
 model_integrated <- intModel(b_rhodani, spatialCovariates = bio10_scaled, 
                              Coordinates = c('X', 'Y'),
                              Projection = projection, Mesh = Mesh, responsePA = 'Present')
 
 
 
-# Run integrated model
-modelRun <- fitISDM(model_po_small, options = list(control.inla = list(int.strategy = 'eb'), 
+# Run integrated models and save them
+dir.create("data/model_fits", showWarnings = FALSE)
+modelRun_po_full <- fitISDM(model_po_full, options = list(control.inla = list(int.strategy = 'eb'), 
                                           safe = TRUE))
+save(modelRun_po_partial, file = here("data","model_fits","modelRun_po_partial.rda"))
+
+
+modelRun_po_partial <- fitISDM(model_po_partial, options = list(control.inla = list(int.strategy = 'eb'), 
+                                                           safe = TRUE))
+save(modelRun_po_partial, file = here("data","model_fits","modelRun_po_partial.rda"))
+
+
+modelRun_pa_only <- fitISDM(model_pa_only, options = list(control.inla = list(int.strategy = 'eb'), 
+                                                              safe = TRUE))
+save(modelRun_pa_only, file = here("data","model_fits","modelRun_pa_only.rda"))
+
+
+modelRun_integrated <- fitISDM(model_integrated, options = list(control.inla = list(int.strategy = 'eb'), 
+                                                              safe = TRUE))
+save(modelRun_integrated, file = here("data","model_fits","modelRun_integrated"))
+
 # Extract summary of the model
-summary(modelRun)
+summary(modelRun_integrated)
 
 # Create a "region" from the shape of bio1_scaled
 #get extent of raster
@@ -128,7 +150,7 @@ bio10_extent_sf <- st_as_sfc(st_bbox(c(bio10_extent[1], bio10_extent[2],
 region <- bio10_extent_sf
 
 # Create prediction plots
-predictions <- predict(modelRun, mesh = Mesh,
+predictions <- predict(modelRun_integrated, mesh = Mesh,
                        mask = Norway, 
                        spatial = TRUE,
                        fun = 'linear')
