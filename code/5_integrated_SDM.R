@@ -20,7 +20,7 @@ projection <- "+proj=longlat +ellps=WGS84"
 
 # Extract species occurrence records
 presence_only <- cleaned_insectdata
-presence_absence <- events_NTNU
+presence_absence_dataset <- events_NTNU
 
 # Read in climate data
 bio10 <- terra::rast(here("data", "derived_data", "bio10_norway.tif"))
@@ -34,7 +34,7 @@ corine2018 <- terra::rast(here("data", "derived_data", "corine_2018_modified_cla
 bio10_scaled <- scale(bio10)
 bio11_scaled <- scale(bio11)
 corine2018_scaled <- scale(corine2018)
-river_distance_scaled <- scale(river_distance)
+#river_distance_scaled <- scale(river_distance)
 
 ## 1.2. Create mesh object ---- 
 
@@ -87,7 +87,7 @@ presence_absence <- presence_absence_dataset |>
 
 # Create list with the two datasets
 b_rhodani <- list(NTNU = presence_absence,
-                Gbif = presence_only)
+                Gbif = presence_only_no_vm)
 
 ## 2.1. Run Integraded SDM ----
 
@@ -119,7 +119,7 @@ model_integrated <- intModel(b_rhodani, spatialCovariates = bio10_scaled,
 dir.create("data/model_fits", showWarnings = FALSE)
 modelRun_po_full <- fitISDM(model_po_full, options = list(control.inla = list(int.strategy = 'eb'), 
                                           safe = TRUE))
-save(modelRun_po_partial, file = here("data","model_fits","modelRun_po_partial.rda"))
+save(modelRun_po_full, file = here("data","model_fits","modelRun_po_full.rda"))
 
 
 modelRun_po_partial <- fitISDM(model_po_partial, options = list(control.inla = list(int.strategy = 'eb'), 
@@ -134,9 +134,19 @@ save(modelRun_pa_only, file = here("data","model_fits","modelRun_pa_only.rda"))
 
 modelRun_integrated <- fitISDM(model_integrated, options = list(control.inla = list(int.strategy = 'eb'), 
                                                               safe = TRUE))
-save(modelRun_integrated, file = here("data","model_fits","modelRun_integrated"))
+save(modelRun_integrated, file = here("data","model_fits","modelRun_integrated.rda"))
+
+
+### load models (new script?) ###
+load("data/model_fits/modelRun_po_full.rda")
+load("data/model_fits/modelRun_po_partial.rda")
+load("data/model_fits/modelRun_pa_only.rda")
+load("data/model_fits/modelRun_integrated.rda")
 
 # Extract summary of the model
+summary(modelRun_po_full)
+summary(modelRun_po_partial)
+summary(modelRun_pa_only)
 summary(modelRun_integrated)
 
 # Create a "region" from the shape of bio1_scaled
@@ -145,15 +155,19 @@ bio10_extent <- terra::ext(bio10_scaled)
 #create an sf polygon from the extent
 bio10_extent_sf <- st_as_sfc(st_bbox(c(bio10_extent[1], bio10_extent[2], 
                                        bio10_extent[3], bio10_extent[4])), 
-                            crs = st_crs(bio10_scaled))
+                             crs = st_crs(bio10_scaled))
 #create "region" object
 region <- bio10_extent_sf
 
 # Create prediction plots
-predictions <- predict(modelRun_integrated, mesh = Mesh,
+predictions <- predict(modelRun_integrated, 
+                       mesh = Mesh,
                        mask = Norway, 
                        spatial = TRUE,
                        fun = 'linear')
 
 # Plot the prediction
 plot(predictions)
+
+
+

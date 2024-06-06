@@ -197,12 +197,18 @@ We created a new download request with the same parameters as in 1.1., and filte
 
 be identified from the `datasetKey` column of the
 
-The data from GBIF belongs to different datasets/data providers. Many sources do not reliably or consistently provide information about sampling structure, sampling methods etc. Therefore, such datasets will have to be treated as occurrence-only. However, for the data provided by the NTNU University Museum, there is enough information present to create a presence-absence dataset for *B. rhodani*. We here have reliable information about sampling method, sampling duration- and area (mostly), and individual counts.
+The data from GBIF belongs to different datasets/data providers. Many sources do not reliably or consistently provide information about sampling structure, sampling methods etc. Therefore, such datasets will have to be treated as occurrence-only. However, for the data provided by the NTNU University Museum, there is enough information present to create a presence-absence dataset for *B. rhodani*. We here have reliable information about sampling method, sampling duration- and area (mostly), and individual counts. As seen in @fig-presence_absence
 
-```{r}
-# Run script
+```{r plot-presence_absence}
+
+#| label: fig-presence_absence
+#| layout-ncol: 1
+#| fig-cap: "Plot of presences/absences of _B. Rhodani_ from the NTNU Freshwater benthic invertebrates ecological collection, filtered by samples taken with comparable sampling protocols."
+
+# Load data
 load("data/derived_data/presence_absence_dataset.Rda")
 
+# plot
 ggplot() +
     coord_fixed() +
     borders(database="world",
@@ -212,11 +218,14 @@ ggplot() +
                aes(x = as.numeric(decimalLongitude), y = as.numeric(decimalLatitude),
                colour = as.factor(presence)),
                size = 0.5) + 
+  labs(color="Presence")
   coord_quickmap() + 
   theme_minimal()
 ```
 
 # CORINE land cover
+
+We used land cover data from the CORINE database to \[...\]
 
 ```{r}
 
@@ -228,7 +237,9 @@ ggplot() +
 
 ```
 
-# WORLDCLIM environmental variable
+# WORLDCLIM bioclimatic data
+
+In order to model the species'
 
 ```{r}
 
@@ -236,7 +247,7 @@ ggplot() +
 
 # Integrated Species Distribution Model
 
-Using species distribution models to investigate the distribution of the mayfly species *Baetis rhodani* in Norway. The goal is to compare the performance and predictions (?) of a SDM using
+Using species distribution models to investigate the distribution of the mayfly species *Baetis rhodani* in Norway. The goal is to compare the performance and predictions (?) of an SDM fitted using
 
 1)  The entire dataset as presence-only data
 
@@ -249,7 +260,7 @@ Using species distribution models to investigate the distribution of the mayfly 
 ```{r SDMs}
 # Run SDM script(s)
 #source(here::here("code","5_integrated_SDM.R"))
-
+load("data/model_fits/")
 ```
 
 # Citations

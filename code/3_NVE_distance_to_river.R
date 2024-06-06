@@ -4,11 +4,6 @@
 
 ################################################################################
 
-# 0. PACKAGES -----
-library(here)
-library(terra)
-library(sf)
-
 # 1. READ IN DATA ----
 
 ## 1.1. Elvenett ----
@@ -17,16 +12,16 @@ library(sf)
 #elvenett <- ("https://ntnu.box.com/shared/static/d0o69swa55oij3u0wber0gz59u6z0c82.geojson")
 main_rivers <- ("https://ntnu.box.com/shared/static/k8z5amhu343xwdtorbafcm0qcxug4uy3.geojson")
 #download.file(elvenett, "Elv_Elvenett.geojson")
-download.file(main_rivers, "Elv_Hovedelv.geojson")
+conditional_download(main_rivers, "data/source_data/Elv_Hovedelv.geojson")
 
 # Load river data 
   # Dataset #Elvenett" from NVE, covering all of Norway including Svalbard
   # Format: GeoJSON v1.0, Geographical coordinates WGS84 - lat long, overlapping
 #elvenett_sf <- sf::read_sf(here("data","Elv_Elvenett.geojson"))
-main_rivers_sf <- sf::read_sf(here("data","Elv_Hovedelv.geojson"))
+main_rivers_sf <- sf::read_sf(here("data", "source_data","Elv_Hovedelv.geojson"))
 
 ## 1.2. CORINE -----
-corine_2018 <- rast(here("data", "corine_2018_modified_classes.tif"))
+corine_2018 <- rast(here("data", "derived_data", "corine_2018_modified_classes.tif"))
 
 # 2. PREPARE FOR ANALYSIS ----
 

@@ -15,8 +15,8 @@ bioclim <- worldclim_country(var='bio', res=0.5, path=here("data", "source_data"
                             country="Norway")
 
 # Load bioclimatic variables
-bioclim10 <- bioclim$wc2.1_30s_bio_10
-bioclim11 <- bioclim$wc2.1_30s_bio_11
+bioclim10 <- bioclim$wc2.1_30s_bio_10 # what is this??
+bioclim11 <- bioclim$wc2.1_30s_bio_11 # what is this??
 
 # Download Norway country shapefile
 norway <- geodata::gadm(country = "NOR", level = 0, 
