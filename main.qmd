@@ -218,12 +218,14 @@ ggplot() +
                aes(x = as.numeric(decimalLongitude), y = as.numeric(decimalLatitude),
                colour = as.factor(presence)),
                size = 0.5) + 
-  labs(color="Presence")
+  labs(color="Presence") +
   coord_quickmap() + 
   theme_minimal()
 ```
 
-# CORINE land cover
+# Environmental variables
+
+## CORINE land cover
 
 We used land cover data from the CORINE database to \[...\]
 
@@ -231,13 +233,13 @@ We used land cover data from the CORINE database to \[...\]
 
 ```
 
-# NVE distance to river
+## NVE distance to main river
 
 ```{r}
 
 ```
 
-# WORLDCLIM bioclimatic data
+## WORLDCLIM bioclimatic data
 
 In order to model the species'
 
@@ -258,10 +260,48 @@ Using species distribution models to investigate the distribution of the mayfly 
 4)  High quality NTNU University data, as well as lower-quality presence-only data.
 
 ```{r SDMs}
+#| eval: false
 # Run SDM script(s)
 #source(here::here("code","5_integrated_SDM.R"))
-load("data/model_fits/")
+
+### load models (new script?) ###
+load("data/model_fits/po_full.rda")
+load("data/model_fits/po_partial.rda")
+load("data/model_fits/pa_only.rda")
+load("data/model_fits/integrated.rda")
+
+# Extract summary of the model
+summary(modelRun_po_full)
+summary(modelRun_po_partial)
+summary(modelRun_pa_only)
+summary(modelRun_integrated)
+
+# Create a "region" from the shape of bio1_scaled
+#get extent of raster
+bio10_extent <- terra::ext(bio10_scaled)
+#create an sf polygon from the extent
+bio10_extent_sf <- st_as_sfc(st_bbox(c(bio10_extent[1], bio10_extent[2], 
+                                       bio10_extent[3], bio10_extent[4])), 
+                             crs = st_crs(bio10_scaled))
+#create "region" object
+region <- bio10_extent_sf
+
+# Create prediction plots
+predictions <- predict(modelRun_integrated, 
+                       mesh = Mesh,
+                       mask = Norway, 
+                       spatial = TRUE,
+                       fun = 'linear')
+
+# Plot the prediction
+plot(predictions)
 ```
+
+::: {#fig-predictions layout-ncol="3"}
+![Spatial predictions based on the presence-only model for the entire dataset.](plot_presence_only.png){#fig-po_pred} ![Spatial predictions based only on the presence-absence from the NTNU University museum.](plot_pa_only_mod.png){#fig-pa_pred} ![Spatial predictions based on the intergrated species distribution model.](plot_integrated_model.png){#fig-integrated_pred}
+
+Spatial predictions from the three fitted models.
+:::
 
 # Citations
 
