@@ -102,7 +102,8 @@ absences <- events_NTNU_sf |>
 
 # Arrange the two plots in a single figure
 presence_absence_map_no_legend <- plot_grid(presences, absences,
-                                  ncol = 2, align = "hv", rel_heights = c(1, 1))
+                                  ncol = 2, align = "hv", rel_heights = c(1, 1),
+                                  labels = c("A", "B"))
 
 # Extract legend from one of the plots
 legend <- get_legend(absences + theme(legend.position = "bottom"))
