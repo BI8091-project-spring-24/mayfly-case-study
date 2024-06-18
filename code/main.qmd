@@ -219,6 +219,10 @@ The data from GBIF belongs to different datasets/data providers. Many sources do
 source(here::here("code","1_4_GBIF_presence_absence_dataset.R"))
 ```
 
+![](images/presence_absence_map.png)
+
+Here, we have plotted the distribution of the presences (A) and absences (B) of *B. rhodani*. contained in NTNU University Museum dataset, with different colours representing different sampling methods.
+
 # CORINE land cover
 
 ```{r}
