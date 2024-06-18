@@ -90,21 +90,7 @@ Then, we checked our records for problematic coordinates. In the entire dataset,
 
 ![](images/flagged_insect_records-02.png)
 
-Finally, we test for temporal outliers on the taxon level, and remove the records:
-
-```{r clean_time}
-# Test for temporal outliers on taxon level
-time_flags <- cf_age(x = insectdata_coords,
-                  lon = "decimalLongitude",
-                  lat = "decimalLatitude",
-                  taxon = "species", 
-                  min_age = "year", 
-                  max_age = "year", 
-                  value = "flagged") # Flagged 8 records
-
-# Exclude records flagged for temporal outliers
-insectdata_no_flags <- insectdata_coords[time_flags, ] 
-```
+Finally, we test for temporal outliers on the taxon level, and remove the eight records that were flagged.
 
 ## 2. Use metadata to improve data quality
 
