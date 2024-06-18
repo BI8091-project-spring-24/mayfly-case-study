@@ -49,7 +49,8 @@ coord_flags <- clean_coordinates(x = insectdata,
                                       lon = "decimalLongitude", 
                                       lat = "decimalLatitude",
                                       species = "acceptedScientificName",
-                                      test = c("centroids", "equal", "gbif", "zeros"))
+                                      test = c("centroids", "equal", 
+                                               "gbif", "zeros"))
 
 # Get a summary of the detected flags
 summary(coord_flags) # only 3 records flagged (centroids)
@@ -87,15 +88,20 @@ time_flags <- cf_age(x = insectdata_coords,
 # Exclude records flagged for temporal outliers
 insectdata_no_flags <- insectdata_coords[time_flags, ]  
 
-# 3. IMPROVE DATA QUALITY WITH META-DATA ----
+# 3. IMPROVE DATA QUALITY WITH META-DATA ---------------------------------------
 
-## 3.1. Coordinate precision ----
+## 3.1. Coordinate precision ---------------------------------------------------
 
 # Boxplot of coordinate precision in insect data
-ggplot(insectdata_no_flags, aes(x = coordinateUncertaintyInMeters)) +
+coord_uncertainty_plot <- ggplot(insectdata_no_flags, 
+                                 aes(x = coordinateUncertaintyInMeters)) +
   geom_boxplot(bins = 30, na.rm = TRUE) +
   labs(x = "Coordinate Uncertainty (m)", y = "Frequency") +
   theme_minimal() # A few records with relatively high coordinate uncertainty
+
+# Save boxplot to file
+ggsave(here("figures", "arenicola_map1.png"),
+       width=13, height=9)
 
 # Summary stats on coordinate uncertainty
 mean(insectdata_no_flags$coordinateUncertaintyInMeters,
@@ -106,13 +112,12 @@ max(insectdata_no_flags$coordinateUncertaintyInMeters,
     na.rm = TRUE) #79110
 
 # Table of frequency of each value of Coordinate Uncertainty
-value_counts <- table(insectdata_no_flags$coordinateUncertaintyInMeters)
-View(value_counts)
+coordinate_uncertainty_df <- table(insectdata_no_flags$coordinateUncertaintyInMeters)
+View(coordinate_uncertainty_df)
 
-# Which Coordinate uncertainty value is most common?
-sorted_value_counts <- sort(value_counts, decreasing = TRUE)
-most_frequent_value <- names(sorted_value_counts)[1]
-most_frequent_value #1m coordinate uncertainty most frequent
+# Write the table to file
+save(coordinate_uncertainty_df,
+     file = here::here("data","derived_data","coordinate_uncertainty_df.Rda"))
 
 # Remove records with coordinate uncertainty >1km and records with NA for coordinate uncertainty
 insectdata_low_uncertainty <- insectdata_no_flags |>
@@ -123,7 +128,7 @@ insectdata_low_uncertainty <- insectdata_no_flags |>
 nrow(insectdata_no_flags) #23547
 nrow(insectdata_low_uncertainty)#23487 (removed 60 records - not so bad)
 
-## 3.2. Data sources ----
+## 3.2. Data sources -----------------------------------------------------------
 
 # Check basis of record in df
 table(insectdata_low_uncertainty$basisOfRecord)
@@ -147,10 +152,11 @@ insectdata_cleaned_count <- insectdata_cleaned_count |>
   filter(!taxonRank == "UNRANKED")
 
 
-## 3.3. REMOVE PROBLEMATIC DATASETS ----
+## 3.3. Remove problematic datasets --------------------------------------------
 
 # Identify datasets with ddmm to dd.dd conversion error 
-out.ddmm <- cd_ddmm(insectdata_cleaned_count, lon = "decimalLongitude", lat = "decimalLatitude", 
+out.ddmm <- cd_ddmm(insectdata_cleaned_count, lon = "decimalLongitude", 
+                    lat = "decimalLatitude", 
                     ds = "species", diagnostic = T, diff = 1,
                     value = "dataset") # 0 records flagged
 
