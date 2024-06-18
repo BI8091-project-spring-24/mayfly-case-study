@@ -84,29 +84,11 @@ First we plotted the records on a world map in order to assess whether there are
 
 ![](images/insect_records_world_map.png){fig-align="center"}
 
-All downloaded records fall within Norway.
+All downloaded records fall within Norway, as expected.
 
-Then, remove records with problematic coordinates and plot the flagged records.
+Then, we checked our records for problematic coordinates. In the entire dataset, only 3 records were flagged for having country centroids as the coordinate values. These records were then removed from the dataset. The flagged records have the value "FALSE" in the plot below.
 
-```{r clean_coords}
-## 2.2. Remove records with problematic coordinates ----
-
-# Extract coordinate flags
-coord_flags <- clean_coordinates(x = insectdata,
-                                      lon = "decimalLongitude", 
-                                      lat = "decimalLatitude",
-                                      species = "acceptedScientificName",
-                                      test = c("centroids", "equal", "gbif", "zeros","maps"))
-
-# Get a summary of the detected flags
-summary(coord_flags) # only 3 records flagged (centroids)
-
-# Plot flagged records
-plot(coord_flags, lon = "decimalLongitude", lat = "decimalLatitude")
-
-# Exclude flagged records
-insectdata_coords <- insectdata[coord_flags$.summary, ]
-```
+![](images/flagged_insect_records-02.png)
 
 Finally, we test for temporal outliers on the taxon level, and remove the records:
 
