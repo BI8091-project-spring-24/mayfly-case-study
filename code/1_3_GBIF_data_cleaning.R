@@ -42,7 +42,7 @@ records_world <- ggplot() +
 ggsave(here("figures", "insect_records_world_map.png"),
        width=13, height=9)
 
-## 2.2. Remove records with problematic coordinates ----
+## 2.2. Remove records with problematic coordinates ----------------------------
 
 # Extract coordinate flags
 coord_flags <- clean_coordinates(x = insectdata,
@@ -55,12 +55,25 @@ coord_flags <- clean_coordinates(x = insectdata,
 summary(coord_flags) # only 3 records flagged (centroids)
 
 # Plot flagged records
-plot(coord_flags, lon = "decimalLongitude", lat = "decimalLatitude")
+flagged_records <- ggplot() +
+  coord_fixed() +
+  geom_point(data = coord_flags,
+             aes(x = decimalLongitude, y = decimalLatitude, color = .cen),
+             size = 0.5) +
+  theme_classic() + 
+  theme(axis.title = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        axis.line = element_blank())
+
+# Save plot to file
+ggsave(here("figures", "flagged_insect_records.png"),
+       width=13, height=9)
 
 # Exclude flagged records
 insectdata_coords <- insectdata[coord_flags$.summary, ]
 
-## 2.3. Remove records with temporal outliers ----
+## 2.3. Remove records with temporal outliers ----------------------------------
 
 # Test for temporal outliers on taxon level
 time_flags <- cf_age(x = insectdata_coords,
