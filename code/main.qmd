@@ -237,9 +237,9 @@ To map the distribution of *B. rhodani*, we use the CORINE Land Cover (CLC) Stat
 
 # WORLDCLIM environmental variable
 
-```{r}
+We also used the Worldclim bioclimatic variables to map the distribution of *B. rhodani.* Specifically, we used bioclim10, Mean Temperature of The Warmest Quarter at a 30 arc second resolution (\~ 1km\^2). Below, we plotted the distribution of the bio10 values across Norway.
 
-```
+![](images/bio10_norway.png)
 
 # Integrated Species Distribution Model
 
