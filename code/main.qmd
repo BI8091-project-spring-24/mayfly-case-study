@@ -225,9 +225,9 @@ Here, we have plotted the distribution of the presences (A) and absences (B) of 
 
 # CORINE land cover
 
-```{r}
+To map the distribution of *B. rhodani*, we use the CORINE Land Cover (CLC) Status 2018 product. CLC has a resolution of 100m x 100m and contains 44 land cover classes. For the purposes of our analysis, the 44 original classes were aggregated into the 10 classes below. Here, we plotted the land cover across Norway as detected by the CLC Status 2018 layer.
 
-```
+![](images/corine_2018_norway.png)
 
 # NVE distance to river
 
