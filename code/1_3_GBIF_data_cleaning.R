@@ -100,7 +100,7 @@ coord_uncertainty_plot <- ggplot(insectdata_no_flags,
   theme_minimal() # A few records with relatively high coordinate uncertainty
 
 # Save boxplot to file
-ggsave(here("figures", "arenicola_map1.png"),
+ggsave(here("figures", "coord_uncertainty_plot.png"),
        width=13, height=9)
 
 # Summary stats on coordinate uncertainty
