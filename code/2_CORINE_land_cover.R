@@ -128,7 +128,6 @@ corine_class <- ggplot(corine_modified_df, aes(x = x, y = y, fill = as.factor(ly
                                "25" = "green4", "26" = "#FF7F00", "29" = "gold1", 
                                "32" = "#6A3D9A", "40" = "aquamarine", "41" = "cornflowerblue"),
                     labels = labels) +
-  labs("Land Cover")+
   coord_fixed() +
   theme_classic() +
   theme(panel.grid.major = element_blank(), 
@@ -137,8 +136,16 @@ corine_class <- ggplot(corine_modified_df, aes(x = x, y = y, fill = as.factor(ly
         axis.text.y = element_blank(),
         axis.ticks.y = element_blank(),
         axis.line.y = element_blank(),
-        legend.position = "bottom")
+        axis.title.x = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.line.x = element_blank(),
+        legend.position = "bottom",
+        legend.title = element_blank())
 
+# Save to file
+ggsave(here("figures", "corine_2018_norway.png"),
+       width=13, height=9)
 
 ## 3.3. Aggregate raster to 1km ------------------------------------------------
 
