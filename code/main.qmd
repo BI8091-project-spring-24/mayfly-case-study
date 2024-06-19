@@ -44,7 +44,6 @@ Load packages: Downloading and loading required packages using a function that c
 #| output: false
 
 source(here::here("code","0_setup.R"))
-
 ```
 
 # Load *Baetis rhodani* data from GBIF
