@@ -98,13 +98,7 @@ To improve the precision and our confidence in the data further, we can use the 
 
 First, we make a boxplot of the coordinate precisions reported for the insect data. Our boxplot shows that some records have very high coordinate uncertainty (m).
 
-```{r coord_boxplot}
-# Boxplot of coordinate precision in insect data
-ggplot(insectdata_no_flags, aes(x = coordinateUncertaintyInMeters)) +
-  geom_boxplot(bins = 30, na.rm = TRUE) +
-  labs(x = "Coordinate Uncertainty (m)", y = "Frequency") +
-  theme_minimal() # A few records with relatively high coordinate uncertainty
-```
+![](images/coord_uncertainty_plot.png)
 
 Then, we calculate some summary stats for the coordinate uncertainties, make a table of each value's frequency, and inspect it:
 
@@ -112,9 +106,6 @@ Then, we calculate some summary stats for the coordinate uncertainties, make a t
 
 # Read data in 
 load(here("data", "derived_data" ,"coordinate_uncertainty_df.Rda"))
-
-# Table of frequency of each value of Coordinate Uncertainty
-value_counts <- table(insectdata_no_flags$coordinateUncertaintyInMeters)
 
 # Which Coordinate uncertainty value is most common?
 sorted_value_counts <- sort(coordinate_uncertainty_df, decreasing = TRUE)
