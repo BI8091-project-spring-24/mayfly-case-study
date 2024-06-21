@@ -10,8 +10,8 @@
 bioclim <- worldclim_global(var='bio', res=30, path=here("data", "source_data"))
 
 # Load bioclimatic variables
-bioclim10 <- bioclim$wc2.1_30s_bio_10
-bioclim11 <- bioclim$wc2.1_30s_bio_11
+bioclim10 <- bioclim$wc2.1_30s_bio_10 # mean temp warmest quarter
+bioclim11 <- bioclim$wc2.1_30s_bio_11 # mean temp coldest quarter
 
 # Download Norway country shapefile
 norway <- geodata::gadm(country = "NOR", level = 0, 
