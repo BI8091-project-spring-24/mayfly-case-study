@@ -9,18 +9,23 @@
 # Searched for the dataset in GBIF, create a download request, date 22.04.024
 
 # GBIF download
-download_url <- "https://api.gbif.org/v1/occurrence/download/request/0200986-240321170329656.zip"
-tmpfile <- tempfile()
-tmpdir <- tempdir()
-download.file(download_url,tmpfile)
-occurrences_NTNU <- rio::import(unzip(tmpfile,files="occurrence.txt",exdir = tmpdir), encoding = "UTF-8") # on the fly unzip and import to R object 
+datset_key <- "33591b80-0e31-480c-82ce-2f57211b10e6" # select freshwater ecological collection
+
+# create download request
+occurrences_NTNU_download <- occ_download(pred("datasetKey", datset_key),
+                                          pred("gadm", "NOR"),
+                                          pred_gte("year", 1950))
+occ_download_wait(occurrences_NTNU_download)
+
+# save as R object
+occurrences_NTNU <- occ_download_get(occurrences_NTNU_download) %>%
+  occ_download_import()
+
 
 # Creating presence absence for B rhodani ----
 
 # Keep occurrences with sampling methods: Kick-sampling, surber-sampling.
 # These methods are suitable in running waters, and common.
-
-print(unique(occurrences_NTNU$samplingProtocol))
 
 sampling_methods <- c("Rot (1 min)","Surber (stor)","Rot (5 min)",
                       "Rot (1 min) x 2","Surber (liten)",
@@ -53,6 +58,8 @@ events_NTNU <- events_NTNU %>%
 # 22403 observations (unique events)
 
 # Save file
+events_NTNU$decimalLatitude <- as.numeric(events_NTNU$decimalLatitude)
+events_NTNU$decimalLongitude <- as.numeric(events_NTNU$decimalLongitude)
 save(events_NTNU,file = here::here("data","derived_data","presence_absence_dataset.Rda"))
 
 # Map of presences and absences ----
