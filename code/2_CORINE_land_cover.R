@@ -10,10 +10,10 @@
 U2018_CLC2018_V2020_20u1 <- ("https://ntnu.box.com/shared/static/iub514rfjnkopg3nu4nc18j4axq5jfon.tif")
 
 # Download the file
-download.file(U2018_CLC2018_V2020_20u1, here("data", "U2018_CLC2018_V2020_20u1.tif"))
+conditional_download(U2018_CLC2018_V2020_20u1, here("data", "source_data", "U2018_CLC2018_V2020_20u1.tif"))
 
 # Read in the layer
-corine_2018 <- rast(here("data", "U2018_CLC2018_V2020_20u1.tif"))
+corine_2018 <- rast(here("data", "source_data", "U2018_CLC2018_V2020_20u1.tif"))
 
 # 2. CUT AND MASK CORINE LAYER TO NORWAY ---------------------------------------
 
