@@ -31,6 +31,7 @@ records_world <- ggplot() +
         axis.line = element_blank())
 
 # Save plot to file
+dir.create(here("figures"), showWarnings = FALSE)
 ggsave(here("figures", "insect_records_world_map.png"),
        width=13, height=9)
 
