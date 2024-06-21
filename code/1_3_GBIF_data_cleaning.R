@@ -171,5 +171,6 @@ out.round <- cd_round(insectdata_cleaned_count, lon = "decimalLongitude",
 
 # Save cleaned df
 cleaned_insectdata <- insectdata_cleaned_count
+dir.create(here("data","derived_data"), showWarnings = FALSE)
 save(cleaned_insectdata, file = here("data","derived_data","cleaned_insectdata.rda"))
 
