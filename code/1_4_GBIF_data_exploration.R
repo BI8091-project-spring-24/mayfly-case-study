@@ -14,9 +14,6 @@ df_institutions <- cleaned_insectdata %>%
   mutate(across(where(is.character), ~ na_if(.,""))) %>%
   filter(!is.na(institutionCode))
 
-# Plot and save figure for top 10 institutions
-jpeg(here::here("results","top_10_institutions.jpg"),width=15,height=10,units="in",res=150)
-
 df_institutions_barplot <- df_institutions %>% 
   arrange(desc(N_occurrences)) %>%
   slice(1:10) %>%
@@ -27,5 +24,11 @@ df_institutions_barplot <- df_institutions %>%
   ylab("Number of occurrences") +
   theme_classic()
 
-dev.off()
+only_mdir <- insectdata_low_uncertainty |> filter(institutionCode == "miljodir")
+as.data.frame(table(only_mdir$samplingProtocol))
 
+only_ntnu <- insectdata_low_uncertainty |> filter(institutionCode == "NTNU-VM")
+as.data.frame(table(only_ntnu$samplingProtocol))
+
+only_nina <- insectdata_low_uncertainty |> filter(institutionCode == "NINA")
+as.data.frame(table(only_nina$samplingProtocol))
