@@ -54,12 +54,11 @@ Norway <- sf::st_transform(Norway, CRS)
 # Crate mesh
 Mesh <- INLA::inla.mesh.2d(boundary = fm_sp2segment(Norway),
                            cutoff = 10,
-                           max.edge=c(60, 80) * 0.25,
+                           max.edge=c(60, 120) * 0.55,
                            min.angle = 20,
-                           offset= c(20,50), 
+                           offset= c(40,80), 
                            crs = st_crs(CRS))
-
-
+plot(Mesh)
 
 # 2. RUN INTEGRATED SDM ----
 
@@ -94,24 +93,26 @@ b_rhodani <- list(NTNU = presence_absence,
 ## 2.1. Run Integraded SDM ----
 
 # Specify model -- here we run a model with one spatial covariate and a shared spatial field
+# specify covariates
+covars <- c(bio10_scaled, bio11_scaled)
 
 # all data as presence-only
-model_po_full <- intModel(presence_only_full, spatialCovariates = bio10_scaled, 
+model_po_full <- intModel(presence_only_full, spatialCovariates = covars, 
                   Coordinates = c('X', 'Y'),
                   Projection = projection, Mesh = Mesh, responsePA = 'Present')
 
 # only presence-only not from VM
-model_po_partial <- intModel(presence_only_no_vm, spatialCovariates = bio10_scaled, 
+model_po_partial <- intModel(presence_only_no_vm, spatialCovariates = covars, 
                   Coordinates = c('X', 'Y'),
                   Projection = projection, Mesh = Mesh, responsePA = 'Present')
 
 # only presence-absence from VM
-model_pa_only <- intModel(presence_absence, spatialCovariates = bio10_scaled, 
+model_pa_only <- intModel(presence_absence, spatialCovariates = covars, 
                              Coordinates = c('X', 'Y'),
                              Projection = projection, Mesh = Mesh, responsePA = 'Present')
 
 # integrated model
-model_integrated <- intModel(b_rhodani, spatialCovariates = bio10_scaled, 
+model_integrated <- intModel(b_rhodani, spatialCovariates = covars, 
                              Coordinates = c('X', 'Y'),
                              Projection = projection, Mesh = Mesh, responsePA = 'Present')
 
@@ -130,7 +131,7 @@ save(modelRun_po_full, pred_po_full, file = here("data","model_fits","po_full.rd
 # partial presence-only
 modelRun_po_partial <- fitISDM(model_po_partial, 
                                options = list(control.inla = list(int.strategy = 'eb'),  safe = TRUE))
-pred_po_partial <- predict(modelRun_pa_only, mesh = Mesh,
+pred_po_partial <- predict(modelRun_po_partial, mesh = Mesh,
                         mask = Norway, spatial = TRUE, fun = 'linear')
 save(modelRun_po_partial, pred_po_partial, file = here("data", "model_fits", "po_partial.rda"))
 

@@ -56,4 +56,4 @@ values(distance_raster) <- as.numeric(distances)
 
 # Save the raster 
 terra::writeRaster(distance_raster, 
-                   here("data", "distance_to_river_raster.tif"))
+                   here("data", "derived_data", "distance_to_river_raster.tif"))

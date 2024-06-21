@@ -261,6 +261,7 @@ Using species distribution models to investigate the distribution of the mayfly 
 
 ```{r SDMs}
 #| eval: false
+#| echo: false
 # Run SDM script(s)
 #source(here::here("code","5_integrated_SDM.R"))
 
@@ -297,8 +298,12 @@ predictions <- predict(modelRun_integrated,
 plot(predictions)
 ```
 
-::: {#fig-predictions layout-ncol="3"}
-![Spatial predictions based on the presence-only model for the entire dataset.](plot_presence_only.png){#fig-po_pred} ![Spatial predictions based only on the presence-absence from the NTNU University museum.](plot_pa_only_mod.png){#fig-pa_pred} ![Spatial predictions based on the intergrated species distribution model.](plot_integrated_model.png){#fig-integrated_pred}
+::: {#fig-predictions layout-nrow=2}
+![Spatial predictions based on the presence-only model for the entire dataset.](plot_presence_only.png){#fig-po_pred} 
+
+![Spatial predictions based only on the presence-absence from the NTNU University museum.](plot_pa_only_mod.png){#fig-pa_pred} 
+
+![Spatial predictions based on the intergrated species distribution model.](plot_integrated_model.png){#fig-integrated_pred}
 
 Spatial predictions from the three fitted models.
 :::
@@ -317,9 +322,6 @@ Manual reference list
 
 -   Peredo Arce, A., Hörren, T., Schletterer, M., & Kail, J. (2021). How far can EPTs fly? A comparison of empirical flying distances of riverine invertebrates and existing dispersal metrics. *Ecological Indicators*, *125*, 107465. https://doi.org/10.1016/j.ecolind.2021.107465
 
-```{r}
-
-```
 
 ## R packages
 
