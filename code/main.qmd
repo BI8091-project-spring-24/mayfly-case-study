@@ -1,12 +1,10 @@
 ---
-title: "A practical application of the pointedSDM package (with a reproducible workflow)"
+title: "A protocol for GBIF data exploration and filtering for Integrated Species Distribution Models - with a practical example"
 format: html
 editor: visual
 ---
 
 # Introduction
-
-\[alternative title suggestion: A protocol for GBIF data exploration and filtering for Integrated Species Distribution Models\]
 
 Modern ecological research is increasingly coming to be characterized by the use of large, multi-source data sets from open-access online repositories - with the infrastructure provided by the Global Biodiversity Information Facility (GBIF) as perhaps the most prominent example. These "big data" on species occurrences are often used to inform species distribution models, where \[say something more here?\]. However, the fact that the data resulting from a single GBIF query (or a similar repository) often come from widely different sources, with different levels of sampling structure, information on species absences etc., remains a challenge.
 
