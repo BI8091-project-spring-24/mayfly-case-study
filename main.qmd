@@ -14,9 +14,15 @@ In this report, we aim to address this issue by demonstrating a suggestion for a
 
 ## Case study
 
-As a case study, we will use the occurrences of the mayfly species *Beatis rhodani*, whose GBIF occurrence data in Norway is known to contain both structured and unstructured samples. In order to assess the value of our approach over more "naïve" ways of modelling the data, we will compare the output of four different SDMs: a presence-only version of our complete GBIF dataset, a presence-absence model of the subset of the data that is determined to be from structured survey, a presence-only model of the subset of the data, and an informed combination of the presence-absence and presence-only subsets of the data.
+As a case study, we will use the occurrences of the mayfly species *Beatis rhodani*, whose GBIF occurrence data in Norway is known to contain both structured and unstructured samples. In order to assess the value of our approach over more "naïve" ways of modelling the data, we will compare the output of four different SDMs:
 
-Study: A practical application of the pointedSDM package (with a reproducible workflow).
+-   A presence-only version of our complete GBIF dataset
+
+-   A presence-absence model of the subset of the data that is determined to be from structured survey
+
+-   A presence-only model of the subset of the data,
+
+-   An informed combination of the presence-absence and presence-only subsets of the data.
 
 This report documents the different steps in the mayfly case study, created for the course Advanced biology BI8091 at NTNU, Spring 2024. The analysis consists of several steps: Selection of invertebrate data points, preparation of environmental variables, running the SDMs and interpreting/discussing the results and possible implications.
 
@@ -34,7 +40,9 @@ We assume that most of the *B. rhodani* datapoints from Norway originate from aq
 
 Mayfly data is accessed through the Global Biodiversity Information Facility (GBIF, ref). Norway is selected as study area, due to the availability of both high-quality species occurrence data (NTNU University Museum) and presence-only data from national monitoring and research. Easily accessible physical, climatic and geographical data also makes Norway a good case-study.
 
-# Setup
+# Workflow
+
+## 0. Setup
 
 Load packages: Downloading and loading required packages using a function that checks whether each package is already downloaded, and only downloads it if not present.
 
@@ -43,11 +51,13 @@ Load packages: Downloading and loading required packages using a function that c
 source(here::here("code","0_setup.R"))
 ```
 
-# Load *Baetis rhodani* data from GBIF
+## 1. Data download and exploration
+
+### 1.1. Create download request for *Baetis rhodani* data from GBIF
 
 In this project, we use data on the mayfly *Baetis rhodani* accessed via GBIF. The GBIF infrastructure provides several options for data download, which all require a GBIF user. Creating a user is free and open for all. Searching for and downloading data can be done via the GBIF website (link here), or it can be done via R using the "rgbif" package. We will demonstrate the latter, at it improves reproducibility.
 
-First, a download request is created. Here we specify the download criteria:
+First, a download request is created. This is shown in the script `1_1_GBIF_download.R`. Here we specify the download criteria:
 
 -   Species: Baetis rhodani (Pictet, 1843)
 
@@ -57,13 +67,17 @@ First, a download request is created. Here we specify the download criteria:
 
 -   Year range: 1950-current
 
-Then, the data is imported and saved as "insectdata.rda". Creating a download request from GBIF only needs to be done once. Afterwards, the dataset from the download request can be accessed directly through a download key or using a API-link. We use a download key to import the dataset.
+Then, the data is imported and saved as "insectdata.rda".
 
-# GBIF data cleaning
+### 1.2. GBIF download using dataset key
+
+Creating a download request from GBIF only needs to be done once. Afterwards, the dataset from the download request can be accessed directly through a download key or using a API-link. We use a download key to import the dataset. This can be done using the script `1_2_GBIF_import.R`
+
+### 1.3. GBIF data cleaning
 
 Before looking into the different sources and "quality levels" of the data, in the dataset, we first clean the downloaded dataset: removing data points with flagged coordinates, temporal outliers, and low coordinate precision (\>1km). The full cleaning procedure is provided in more detail in the script `1_3_GBIF_data_cleaning.R`.
 
-### Procedure (simplified)
+#### Procedure (simplified):
 
 -   Visualize the raw data
 
@@ -88,8 +102,8 @@ The cleaned data is visualized in @fig-coords, with points removed in the cleani
 #| layout-ncol: 1
 #| fig-cap: "Coordinates for the cleaned occurrences (blue, $N=23434$) of B. Rhodani in Norway, and removed points (red, $N=124$)."
 #| truncate: true
-load(here("../data", "source_data","insectsdata.rda"))
-load(here("data/derived_data/cleaned_insectsdata.rda"))
+load(here("data", "source_data","insectdata.rda"))
+load(here("data/derived_data/cleaned_insectdata.rda"))
 
 #filter out the filtered-out observations
 removed_obs <- subset(insectdata, !(occurrenceID %in% cleaned_insectdata$occurrenceID))
@@ -128,20 +142,9 @@ Then, remove records with coordinate uncertainty \>1km and records with NA for c
 
 Save the cleaned files. The cleaned dataset is now called insectdata_low_uncertainty (?).
 
-## Load cleaned datafiles
+### 1.4. Data exploration
 
-Alternative to running all the cleaning steps.
-
-```{r load_cleaned_datafiles}
-load(here::here("data","derived_data","insectdata_no_flags.rda"))
-
-load(here::here("data","derived_data","insectdata_low_uncertainty.rda"))
-
-```
-
-# Data exploration
-
-The cleaned data originates from different data providers. The 10 largest data sources are shown below, and we see that after The University Museum (NTNU-VM), The Environment Agency (miljodir) and The Norwegian Institute for Nature Research (NINA) are the instiutions providing the highest number of datapoints.
+The cleaned data originates from different data providers. The 10 largest data sources are shown below, and we see that after The University Museum (NTNU-VM), The Environment Agency (miljodir) and The Norwegian Institute for Nature Research (NINA) are the instiutions providing the highest number of data points.
 
 ```{r}
 ###
@@ -172,46 +175,66 @@ df_institutions_barplot
 
 ```
 
-However, both The Environment Agency and NINA are missing information on sampling protocol. They will, together with the smaller datasets, be treated as presence-only data.
+As visualized in @fig-institutions-points, the *B. rhodani* data points are distributed across Norway, with higher concentrations of data points visible near large cities.
 
-The *B. rhodani* data points are distributed across Norway, with higher concentrations of data points visible near large cities. We here plot the Environment Agency and NINA data:
-
-```{r}
-only_mdir <- insectdata_low_uncertainty |> filter(institutionCode == "miljodir")
-only_nina <- insectdata_low_uncertainty |> filter(institutionCode == "NINA")
-
+```{r plot-institutions}
+#| label: fig-institutions-points
+#| layout-ncol: 1
+#| fig-cap: "Coordinates for the samples provided by the the largest data providers in the study: The NTNU University Museum (NTNU-VM), the Norwegian Environmental Agency (miljodir) and the Norwegian Institute for Nature Research (NINA)."
+#| truncate: true
+largest_providers <- cleaned_insectdata |> filter(institutionCode %in% c("NTNU-VM", "miljodir", "NINA"))
 ggplot() +
   coord_fixed() +
-  geom_point(data = only_mdir,
-             aes(x = decimalLongitude, y = decimalLatitude),
-             colour = "darkred",
-             size = 0.5) +
-  ggtitle("Only The Environment Agency (Miljodirektoratet)") +
-  theme_classic()
+  borders(database="world",
+          regions="Norway(?!:Svalbard)", colour = "gray70", fill = "gray90",
+          xlim=c(4.5, 32)) +
+  geom_point(data = largest_providers,
+             aes(x = decimalLongitude, 
+                 y = decimalLatitude,
+                 color = institutionCode),
+             size = 0.5,
+             alpha=0.5) +
+  coord_quickmap() +
+  facet_wrap(~institutionCode) +
+  labs(color="Data provider") +
+  theme_minimal() +
+    theme(legend.position = "bottom") 
+```
 
+Another distinct feature of the data, is the fact that NTNU university museum samples seem to be heavily localized in middle / northern Norway, while the two other data sets are more evenly distributed across the country, with the exception of the northernmost Finnmark region, where the sampling effort is low for all data sets.
+
+### 1.5. Creating presence-absence dataset
+
+From inspecting the cleaned dataset, we see that both the Environmental Agency and NINA are missing information on the sampling protocol. By comparison, the NTNU University Museum provides reliable information about the sampling method for nearly all samples (14173 of 14184 occurrences), sampling duration- and area (mostly), as well as individual counts, sampling duration- and area (mostly), and individual counts.
+
+On the basis of this, we propose that the Environmental Agency and NINA data, together with the data from smaller providers, be treated as presence-only date, while the NTNU University Museum dataset has enough structure for us to construct a presence-absence dataset, given comparable samples taken with the same protocol where *B. rhodani* is absent.
+
+In order to find these, we can look at the `datasetKey` column in the dataset, and make a new GBIF request based on that. As it turns out, nearly all the samples from the NTNU Science Museum originate from a single dataset, the [Freshwater benthic invertebrates ecological collection](https://www.gbif.org/dataset/33591b80-0e31-480c-82ce-2f57211b10e6).
+
+We created a new download request with the same parameters as in 1.1., and filtered it to only contain samples obtained with sampling methods suitable for catching *B. rhodani*. Details on this procedure can be found in the script `1_5_GBIF_presence_absence_dataset.R`.
+
+```{r plot-presence_absence}
+#| label: fig-presence_absence
+#| layout-ncol: 1
+#| fig-cap: "Plot of presences/absences (1/0) of _B. Rhodani_ from the NTNU Freshwater benthic invertebrates ecological collection, filtered by samples taken with comparable sampling protocols."
+
+# Load data
+load("data/derived_data/presence_absence_dataset.Rda")
+
+# plot
 ggplot() +
-  coord_fixed() +
-  geom_point(data = only_nina,
-             aes(x = decimalLongitude, y = decimalLatitude),
-             colour = "darkred",
-             size = 0.5) +
-  ggtitle("Only NINA") +
-  theme_classic()
+    coord_fixed() +
+    borders(database="world",
+            regions="Norway(?!:Svalbard)", colour = "gray70", fill = "gray90",
+            xlim=c(4.5, 32)) +
+    geom_point(data = events_NTNU,
+               aes(x = as.numeric(decimalLongitude), y = as.numeric(decimalLatitude),
+               colour = as.factor(presence)),
+               size = 0.5) + 
+  labs(color="Presence") +
+  coord_quickmap() + 
+  theme_minimal()
 ```
-
-# Creating presence-absence dataset
-
-The data from GBIF belongs to different datasets/data providers. Many sources do not reliably or consistently provide information about sampling structure, sampling methods etc. Therefore, such datasets will have to be treated as occurrence-only. However, for the data provided by the NTNU University Museum, there is enough information present to create a presence-absence dataset for *B. rhodani*. We here have reliable information about sampling method, sampling duration- and area (mostly), and individual counts.
-
-```{r}
-#| eval=false
-# Run script
-source(here::here("code","1_5_GBIF_presence_absence_dataset.R"))
-```
-
-![](images/presence_absence_map.png)
-
-Here, we have plotted the distribution of the presences (A) and absences (B) of *B. rhodani*. contained in NTNU University Museum dataset, with different colours representing different sampling methods.
 
 # CORINE land cover
 
@@ -225,19 +248,51 @@ We also used the Worldclim bioclimatic variables to map the distribution of *B. 
 
 ![](images/bio10_norway.png)
 
-# Integrated Species Distribution Model
+## 5. Integrated Species Distribution Model
 
-Using species distribution models to investigate the distribution of the mayfly species *Baetis rhodani* in Norway. The goal is to compare the performance and predictions (?) of a SDM using
+\[A few lines about how we set up the model\]. See the script `5_integrated_SDM.R` for more details.
 
-1)  Only high-quality data from structured sampling done by NTNU University museum. For this data, we have information on species occurrence, sampling method, and number of individuals per sampling unit.
+# Results and discussion
 
-2)  Only lower quality presence-only data.
-
-3)  High quality NTNU University data as in 1, as well as lower-quality presence-only data.
+\[say sometyhing (short) about the results of th SDMs and their interpretations.\]
 
 ```{r SDMs}
+#| eval: false
+#| echo: false
 # Run SDM script(s)
-source(here::here("code","5_integrated_SDM.R"))
+#source(here::here("code","5_integrated_SDM.R"))
+
+### load models (new script?) ###
+load("data/model_fits/po_full.rda")
+load("data/model_fits/po_partial.rda")
+load("data/model_fits/pa_only.rda")
+load("data/model_fits/integrated.rda")
+
+# Extract summary of the model
+summary(modelRun_po_full)
+summary(modelRun_po_partial)
+summary(modelRun_pa_only)
+summary(modelRun_integrated)
+
+# Create a "region" from the shape of bio1_scaled
+#get extent of raster
+bio10_extent <- terra::ext(bio10_scaled)
+#create an sf polygon from the extent
+bio10_extent_sf <- st_as_sfc(st_bbox(c(bio10_extent[1], bio10_extent[2], 
+                                       bio10_extent[3], bio10_extent[4])), 
+                             crs = st_crs(bio10_scaled))
+#create "region" object
+region <- bio10_extent_sf
+
+# Create prediction plots
+predictions <- predict(modelRun_integrated, 
+                       mesh = Mesh,
+                       mask = Norway, 
+                       spatial = TRUE,
+                       fun = 'linear')
+
+# Plot the prediction
+plot(predictions)
 
 ```
 
