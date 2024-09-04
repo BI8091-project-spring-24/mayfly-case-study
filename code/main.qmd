@@ -61,29 +61,56 @@ Then, the data is imported and saved as "insectdata.rda". Creating a download re
 
 # GBIF data cleaning
 
-## 1. Remove flagged coordinate and time records
+Before looking into the different sources and "quality levels" of the data, in the dataset, we first clean the downloaded dataset: removing data points with flagged coordinates, temporal outliers, and low coordinate precision (\>1km). The full cleaning procedure is provided in more detail in the script `1_3_GBIF_data_cleaning.R`.
 
-First we plotted the records on a world map in order to assess whether there are any downloaded records falling outside of Norway.
+### Procedure (simplified)
 
-![](images/insect_records_world_map.png){fig-align="center"}
+-   Visualize the raw data
 
-All downloaded records fall within Norway, as expected.
+-   Then, remove records with problematic coordinates and plot the flagged records.
 
-Then, we checked our records for problematic coordinates. In the entire dataset, only 3 records were flagged for having country centroids as the coordinate values. These records were then removed from the dataset. The flagged records have the value "FALSE" in the plot below.
-
-![](images/flagged_insect_records-02.png)
-
-Finally, we test for temporal outliers on the taxon level, and remove the eight records that were flagged.
-
-## 2. Use metadata to improve data quality
+-   Finally, we test for temporal outliers on the taxon level, and remove the records
 
 To improve the precision and our confidence in the data further, we can use the metadata included in the dataset.
 
-First, we make a boxplot of the coordinate precisions reported for the insect data. Our boxplot shows that some records have very high coordinate uncertainty (m).
+-   First, make a boxplot of the coordinate precisions reported for the insect data.
 
-![](images/coord_uncertainty_plot.png)
+-   Then, calculate some summary stats for the coordinate uncertainties, make a table of each value's frequency, and inspect it.
 
-Then, we calculate some summary stats for the coordinate uncertainties, make a table of each value's frequency, and inspect it:
+-   Then, remove records with coordinate uncertainty \>3km and records with NA for coordinate uncertainty.
+
+-   Save the cleaned files. The cleaned dataset is now called `insectdata_low_uncertainty`.
+
+The cleaned data is visualized in @fig-coords, with points removed in the cleaning procedure marked in red.
+
+```{r plot-cleaned}
+#| label: fig-coords
+#| layout-ncol: 1
+#| fig-cap: "Coordinates for the cleaned occurrences (blue, $N=23434$) of B. Rhodani in Norway, and removed points (red, $N=124$)."
+#| truncate: true
+load(here("../data", "source_data","insectsdata.rda"))
+load(here("data/derived_data/cleaned_insectsdata.rda"))
+
+#filter out the filtered-out observations
+removed_obs <- subset(insectdata, !(occurrenceID %in% cleaned_insectdata$occurrenceID))
+
+# make plot of raw v cleaned obs
+ggplot() +
+  coord_fixed() +
+  borders(database="world",
+          regions="Norway(?!:Svalbard)", colour = "gray70", fill = "gray90",
+          xlim=c(4.5, 32)) +
+  geom_point(data = cleaned_insectdata,
+             aes(x = decimalLongitude, y = decimalLatitude),
+             colour = "darkblue",
+             size = 0.5) +
+  geom_point(data = removed_obs,
+             aes(x = decimalLongitude, y = decimalLatitude),
+             colour = "red",
+             size = 0.5) +
+  coord_quickmap() +
+  theme_classic()
+```
 
 ```{r coord_summary}
 
@@ -191,7 +218,6 @@ Here, we have plotted the distribution of the presences (A) and absences (B) of 
 To map the distribution of *B. rhodani*, we use the CORINE Land Cover (CLC) Status 2018 product. CLC has a resolution of 100m x 100m and contains 44 land cover classes. For the purposes of our analysis, the 44 original classes were aggregated into the 10 classes below. Here, we plotted the land cover across Norway as detected by the CLC Status 2018 layer.
 
 ![](images/corine_2018_norway.png)
-
 
 # WORLDCLIM environmental variable
 
