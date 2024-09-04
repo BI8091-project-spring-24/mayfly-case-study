@@ -219,11 +219,6 @@ To map the distribution of *B. rhodani*, we use the CORINE Land Cover (CLC) Stat
 
 ![](images/corine_2018_norway.png)
 
-# NVE distance to river
-
-```{r}
-
-```
 
 # WORLDCLIM environmental variable
 
@@ -261,9 +256,6 @@ Manual reference list
 
 -   Peredo Arce, A., Hörren, T., Schletterer, M., & Kail, J. (2021). How far can EPTs fly? A comparison of empirical flying distances of riverine invertebrates and existing dispersal metrics. *Ecological Indicators*, *125*, 107465. https://doi.org/10.1016/j.ecolind.2021.107465
 
-```{r}
-
-```
 
 ## R packages
 
