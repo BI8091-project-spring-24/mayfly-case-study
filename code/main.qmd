@@ -1,16 +1,14 @@
 ---
-title: "A practical application of the pointedSDM package (with a reproducible workflow)"
+title: "A protocol for GBIF data exploration and filtering for Integrated Species Distribution Models - with a practical example"
 format: html
 editor: visual
 ---
 
 # Introduction
 
-\[alternative title suggestion: A protocol for GBIF data exploration and filtering for Integrated Species Distribution Models\]
+Modern ecological research is increasingly coming to be characterized by the use of large, multi-source data sets from open-access online repositories - with the infrastructure provided by the Global Biodiversity Information Facility (GBIF) as perhaps the most prominent example. These "big data" on species occurrences are often used to inform species distribution models. However, the fact that the data resulting from a single GBIF query (or a similar repository) often come from widely different sources, with different levels of sampling structure, information on species absences etc., remains a challenge.
 
-Modern ecological research is increasingly coming to be characterized by the use of large, multi-source data sets from open-access online repositories - with the infrastructure provided by the Global Biodiversity Information Facility (GBIF) as perhaps the most prominent example. These "big data" on species occurrences are often used to inform species distribution models, where \[say something more here?\]. However, the fact that the data resulting from a single GBIF query (or a similar repository) often come from widely different sources, with different levels of sampling structure, information on species absences etc., remains a challenge.
-
-Recent advances in species distribution modelling, exemplified with the release of the `R` package `pointedSDM` (REF), does increasingly allow for the combination of multiple species occurrence data sets with different levels of sample information (i.e. presence-only, presence-absence, counts etc), into a single integrated model (iSDM). Still, practical and actionable advice for how to best obtain, validate and prepare this differentiated data from an online repository, seems to be comparatively lacking in the literature.
+Recent advances in species distribution modelling, exemplified with the release of the `R` package `pointedSDM` (Mostert & O'Hara, 2023), does increasingly allow for the combination of multiple species occurrence data sets with different levels of sample information (i.e. presence-only, presence-absence, counts etc), into a single integrated model (iSDM). Still, practical and actionable advice for how to best obtain, validate and prepare this differentiated data from an online repository, seems to be comparatively lacking in the literature.
 
 In this report, we aim to address this issue by demonstrating a suggestion for a complete and reproducible workflow for data download, cleaning, exploration and differentiating, from a simple GBIF query to fitting an integrated SDM with the `pointedSDM` package.
 
@@ -219,11 +217,6 @@ To map the distribution of *B. rhodani*, we use the CORINE Land Cover (CLC) Stat
 
 ![](images/corine_2018_norway.png)
 
-# NVE distance to river
-
-```{r}
-
-```
 
 # WORLDCLIM environmental variable
 
@@ -260,8 +253,6 @@ Manual reference list
 -   Bagge, P. (1995). Emergence and upstream flight of lotic mayflies and caddisflies (Ephemeroptera and Trichoptera) in a lake outlet, central Finland. *Entomologica Fennica*, *6*(2-3), 91--97. https://doi.org/10.33338/ef.83844
 
 -   Peredo Arce, A., Hörren, T., Schletterer, M., & Kail, J. (2021). How far can EPTs fly? A comparison of empirical flying distances of riverine invertebrates and existing dispersal metrics. *Ecological Indicators*, *125*, 107465. https://doi.org/10.1016/j.ecolind.2021.107465
-
-## R packages
 
 Citing R and packages used, including package version.
 
