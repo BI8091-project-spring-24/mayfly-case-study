@@ -42,7 +42,6 @@ Load packages: Downloading and loading required packages using a function that c
 
 ```{r 0_setup}
 #| output: false
-
 source(here::here("code","0_setup.R"))
 ```
 
@@ -205,8 +204,9 @@ ggplot() +
 The data from GBIF belongs to different datasets/data providers. Many sources do not reliably or consistently provide information about sampling structure, sampling methods etc. Therefore, such datasets will have to be treated as occurrence-only. However, for the data provided by the NTNU University Museum, there is enough information present to create a presence-absence dataset for *B. rhodani*. We here have reliable information about sampling method, sampling duration- and area (mostly), and individual counts.
 
 ```{r}
+#| eval=false
 # Run script
-source(here::here("code","1_4_GBIF_presence_absence_dataset.R"))
+source(here::here("code","1_5_GBIF_presence_absence_dataset.R"))
 ```
 
 ![](images/presence_absence_map.png)
@@ -260,10 +260,6 @@ Manual reference list
 -   Bagge, P. (1995). Emergence and upstream flight of lotic mayflies and caddisflies (Ephemeroptera and Trichoptera) in a lake outlet, central Finland. *Entomologica Fennica*, *6*(2-3), 91--97. https://doi.org/10.33338/ef.83844
 
 -   Peredo Arce, A., Hörren, T., Schletterer, M., & Kail, J. (2021). How far can EPTs fly? A comparison of empirical flying distances of riverine invertebrates and existing dispersal metrics. *Ecological Indicators*, *125*, 107465. https://doi.org/10.1016/j.ecolind.2021.107465
-
-```{r}
-
-```
 
 ## R packages
 
