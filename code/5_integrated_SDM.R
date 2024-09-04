@@ -54,8 +54,8 @@ Norway <- sf::st_transform(Norway, CRS)
 
 # Crate mesh
 Mesh <- INLA::inla.mesh.2d(boundary = fm_sp2segment(Norway),
-                           cutoff = 10,
-                           max.edge=c(60, 120) * 0.55,
+                           cutoff = 20,
+                           max.edge=c(60, 120) * 0.75,
                            min.angle = 20,
                            offset= c(40,80), 
                            crs = st_crs(CRS))
@@ -143,6 +143,13 @@ modelRun_pa_only <- fitISDM(model_pa_only,
 pred_pa_only <- predict(modelRun_pa_only, mesh = Mesh,
                         mask = Norway, spatial = TRUE, fun = 'linear')
 save(modelRun_pa_only, pred_pa_only, file = here("data","model_fits","pa_only.rda"))
+
+# presence-absence only
+modelRun_integrated <- fitISDM(model_integrated, 
+                            options = list(control.inla = list(int.strategy = 'eb'), safe = TRUE))
+pred_integrated <- predict(modelRun_integrated, mesh = Mesh,
+                        mask = Norway, spatial = TRUE, fun = 'linear')
+save(modelRun_integrated, pred_integrated, file = here("data","model_fits","integrated.rda"))
 
 #### do we need this – i'm thinking just loading the prediction objects in the main file ####
 # Create a "region" from the shape of bio1_scaled
