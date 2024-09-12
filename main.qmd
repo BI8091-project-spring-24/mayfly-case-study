@@ -224,7 +224,9 @@ ggplot() +
 
 ## 2. WORLDCLIM environmental variables
 
-We used the Worldclim bioclimatic variables to map the distribution of *B. rhodani.* Specifically, we used bioclim10 (Mean Temperature of The Warmest Quarter) and bioclim11 (Mean Temperature of The Coldest Quarter) at a 30 arc second resolution (\~ 1km\^2). Below, we plotted the distribution of the bio10 and bio11 values across Norway. These particular variables were chosen due to their assumed impact on water temperature, as water temperature is known to be important for *B. rhodani* development. Preliminary analysis revealed a significant but moderate correlation value between the two climate variables (r = 0.559, p \< 0.001). Therefore, the two variables were used in the SDMs.
+We used the Worldclim bioclimatic variables to map the distribution of *B. rhodani.* Specifically, we used bioclim10 (Mean Temperature of The Warmest Quarter) and bioclim11 (Mean Temperature of The Coldest Quarter) at a 30 arc second resolution (\~ 1km\^2). Below, we plotted the distribution of the bio10 and bio11 values across Norway. These particular variables were chosen due to their assumed impact on water temperature, as water temperature is known to be important for *B. rhodani* development. Preliminary analysis revealed a significant but moderate correlation value between the two climate variables (r = 0.559, t(877822) = 631, p \< 0.001). Therefore, the two variables were used in the SDMs.
+
+In this report, we chose to include WORLDCLIM 10 and 11 as predictor variables to our iSDM. In order to predict the distribution of *Baetis rhodani*, it could also be of interest to include land-cover data (i.e, CORINE land cover data, ref) or distance to rivers (i.e., created using the river network dataset provided by NVE, ref).
 
 ![](images/bio10_norway.png)
 
@@ -282,9 +284,13 @@ Manual reference list
 
 -   Bagge, P. (1995). Emergence and upstream flight of lotic mayflies and caddisflies (Ephemeroptera and Trichoptera) in a lake outlet, central Finland. *Entomologica Fennica*, *6*(2-3), 91--97. https://doi.org/10.33338/ef.83844
 
+-   European Environment Agency (EEA) (2018). *CORINE Land Cover 2018 (CLC2018), Version 20_2018, European Environment Agency.* Retrieved from https://land.copernicus.eu/pan-european/corine-land-cover
+
 -   GBIF.org (2024), GBIF Home Page. Available from: [https://www.gbif.or](https://www.gbif.org/)g.
 
 -   Mostert, P. S., & O’Hara, R. B. (2023). PointedSDMs: An R package to help facilitate the construction of integrated species distribution models. *Methods in Ecology and Evolution*, 14, 1200–1207. <https://doi.org/10.1111/2041-210X.14091>
+
+-   NVE (2020, October 7). Elvenettverk/ELVIS. Retrieved from: <https://www.nve.no/kart/kartdata/vassdragsdata/elvenettverk-elvis/>
 
 -   Peredo Arce, A., Hörren, T., Schletterer, M., & Kail, J. (2021). How far can EPTs fly? A comparison of empirical flying distances of riverine invertebrates and existing dispersal metrics. *Ecological Indicators*, *125*, 107465. https://doi.org/10.1016/j.ecolind.2021.107465
 
