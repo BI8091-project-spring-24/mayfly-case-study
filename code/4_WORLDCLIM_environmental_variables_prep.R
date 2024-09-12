@@ -7,7 +7,7 @@
 # 1. CUT BIOCLIMATIC VARIABLES TO NORWAY ---------------------------------------
 
 # Download bioclimatic variables
-bioclim <- worldclim_global(var='bio', res=30, path=here("data", "source_data"))
+bioclim <- worldclim_global(var='bio', res=0.5, path=here("data", "source_data"))
 
 # Load bioclimatic variables
 bioclim10 <- bioclim$wc2.1_30s_bio_10 # mean temp warmest quarter
@@ -30,7 +30,7 @@ crs(bio10_reprojected, proj = TRUE)
 
 # Cut and mask bioclimatic variables to Norway
 bio10_norway <- crop(bio10_reprojected, norway_reprojected, 
-                    mask = TRUE)
+                     mask = TRUE)
 bio11_norway <- crop(bio11_reprojected, norway_reprojected, 
                      mask = TRUE)
 
@@ -40,40 +40,12 @@ terra::writeRaster(bio10_norway,
 terra::writeRaster(bio11_norway, 
                    here("data", "derived_data", "bio11_norway.tif"))
 
-# 2. PLOT BIOCLIMATIC VARIABLES TO NORWAY --------------------------------------
+# 2. CHECK CORRELATION ---------------------------------------------------------
 
-# Read in CORINE layer
-norway_corine <- rast(here("data", "derived_data", "norway_corine_2018.tif"))
+# Convert rasters to dfs
+bio10_norway <- as.data.frame(bio10_norway, xy = TRUE)
+bio11_norway <- as.data.frame(bio11_norway, xy = TRUE)
 
-# Re-project bio10 to match CORINE
-bio10_corine_proj <- project(bio10_norway, crs(norway_corine))
-
-# Convert bio10 to df
-bio10_corine_proj_df <- as.data.frame(bio10_corine_proj, xy = TRUE) |>
-  rename(bio10 = wc2.1_30s_bio_10)
-
-# Plot map 
-bio10_map <- ggplot()+
-  geom_tile(data = bio10_corine_proj_df, aes(x = x, y = y, fill = bio10)) +
-  coord_fixed() +
-  annotation_north_arrow(location = "br", which_north = "true",
-                         pad_y = unit(0.8, "cm"),
-                         style = north_arrow_fancy_orienteering) +
-  annotation_scale(location = "br") +
-  scale_colour_viridis_c() +
-  theme_classic() +
-  theme(panel.grid.major = element_blank(), 
-        panel.grid.minor = element_blank(),
-        axis.title.y = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks.y = element_blank(),
-        axis.line.y = element_blank(),
-        axis.title.x = element_blank(),
-        axis.text.x = element_blank(),
-        axis.ticks.x = element_blank(),
-        axis.line.x = element_blank(),
-        legend.position = "bottom")
-
-# Save to file
-ggsave(here("figures", "bio10_norway.png"),
-       width=13, height=9)
+# Run correlation test
+cor.test(bio10_norway_df$wc2.1_30s_bio_10, bio11_norway_df$wc2.1_30s_bio_11)
+# r = 0.5586072, p-value < 2.2e-16, t = 631.
