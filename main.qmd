@@ -222,19 +222,17 @@ ggplot() +
   theme_minimal()
 ```
 
-# WORLDCLIM environmental variables
+## 2. WORLDCLIM environmental variables
 
 We used the Worldclim bioclimatic variables to map the distribution of *B. rhodani.* Specifically, we used bioclim10 (Mean Temperature of The Warmest Quarter) and bioclim11 (Mean Temperature of The Coldest Quarter) at a 30 arc second resolution (\~ 1km\^2). Below, we plotted the distribution of the bio10 and bio11 values across Norway. These particular variables were chosen due to their assumed impact on water temperature, as water temperature is known to be important for *B. rhodani* development. Preliminary analysis revealed a low correlation value between the two climate variables (
 
 ![](images/bio10_norway.png)
 
-## 5. Integrated Species Distribution Model
+## 3. Integrated Species Distribution Model
 
-We set up the `INLA` raster to be used in the `pointedSDM` model according to the recommendations provided at \[kilde\], and using our own intuition to adjust the mesh coarseness in order to balance performance and accuracy given the amount and spread of the data provided. All environmental variables were centered and scaled to mean zero and unit variance, and four different models were specified, according to the study questions outlined above.
+We set up the `INLA` raster to be used in the `pointedSDM` model according to the recommendations provided at (Mostert & O’Hara, 2023). Mesh coarseness was adjusted in order to balance performance and accuracy given the amount and spread of the data provided. All environmental variables were centered and scaled to mean zero and unit variance, and four different models were specified, according to the study questions outlined above.
 
-\[A few lines about how we set up the model\].
-
-See the script `5_integrated_SDM.R` for more details.
+For more details on model set up and mesh adjustment, see the script `5_integrated_SDM.R`.
 
 # Results and discussion
 
@@ -283,6 +281,8 @@ Manual reference list
 -   Bagge, P. (1995). Emergence and upstream flight of lotic mayflies and caddisflies (Ephemeroptera and Trichoptera) in a lake outlet, central Finland. *Entomologica Fennica*, *6*(2-3), 91--97. https://doi.org/10.33338/ef.83844
 
 -   GBIF.org (2024), GBIF Home Page. Available from: [https://www.gbif.or](https://www.gbif.org/)g.
+
+-   Mostert, P. S., & O’Hara, R. B. (2023). PointedSDMs: An R package to help facilitate the construction of integrated species distribution models. *Methods in Ecology and Evolution*, 14, 1200–1207. <https://doi.org/10.1111/2041-210X.14091>
 
 -   Peredo Arce, A., Hörren, T., Schletterer, M., & Kail, J. (2021). How far can EPTs fly? A comparison of empirical flying distances of riverine invertebrates and existing dispersal metrics. *Ecological Indicators*, *125*, 107465. https://doi.org/10.1016/j.ecolind.2021.107465
 
