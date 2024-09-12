@@ -28,7 +28,16 @@ sapply(package_vec, install.load.package)
 
 # INLA is not on CRAN, so has to be installed separately
 #install.packages("INLA",repos=c(getOption("repos"),INLA="https://inla.r-inla-download.org/R/stable"), dep=TRUE) 
-library("INLA")
+
+if (!require("INLA")) {
+  # Install INLA if not already installed
+  install.packages("INLA", repos = c(getOption("repos"), INLA = "https://inla.r-inla-download.org/R/stable"), dep = TRUE)
+  # Load the INLA library after installation
+  library("INLA")
+} else {
+  # Load INLA if already installed
+  library("INLA")
+}
 
 # Conditional download function, which can be used to check if a file already exists
 conditional_download <- function(url, target) {
