@@ -236,8 +236,6 @@ For more details on model set up and mesh adjustment, see the script `5_integrat
 
 # Results
 
-For each of the four models,
-
 Predictions of the likelihood of occurrence of B. rhodani were created for each of the four models, as seen in @fig-predictions.
 
 ```{r SDMs}
@@ -269,6 +267,8 @@ modelRun_integrated$summary.fixed
 
 
 ```
+
+# Model interpretation and discussion
 
 # Citations
 
