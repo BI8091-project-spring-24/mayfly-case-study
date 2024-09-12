@@ -228,7 +228,39 @@ We used the Worldclim bioclimatic variables to map the distribution of *B. rhoda
 
 In this report, we chose to include WORLDCLIM 10 and 11 as predictor variables to our iSDM. In order to predict the distribution of *Baetis rhodani*, it could also be of interest to include land-cover data (i.e, CORINE land cover data, ref) or distance to rivers (i.e., created using the river network dataset provided by NVE, ref).
 
-![](images/bio10_norway.png)
+```{r plot worldclim}
+#| label: fig-worldclim
+#| layout-ncol: 1
+#| fig-cap: "Plot of Mean Temperature of The Warmest Quarter and Mean Temperature of The Coldest Quarter across Norway"
+
+load("data/source_data/wc2.1_30s/wc2.1_30s_bio_10.tif")
+load("data/source_data/wc2.1_30s/wc2.1_30s_bio_11.tif")
+
+# Convert rasters to data frames for ggplot
+bio10_norway_df <- as.data.frame(bio10_norway, xy = TRUE)
+bio11_norway_df <- as.data.frame(bio11_norway, xy = TRUE)
+
+# Plot for bio10
+bio10_plot <- ggplot(data = bio10_norway_df) +
+  geom_raster(aes(x = x, y = y, fill = wc2.1_30s_bio_10)) + 
+  borders(database = "world", regions = "Norway(?!:Svalbard)", colour = "gray70") +
+  coord_quickmap() +
+  labs(fill = "Mean Temperature of The Warmest Quarter (°C)")+
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
+# Plot for bio11
+bio11_plot <- ggplot(data = bio11_norway_df) +
+  geom_raster(aes(x = x, y = y, fill = wc2.1_30s_bio_11)) + 
+  borders(database = "world", regions = "Norway(?!:Svalbard)", colour = "gray70") +
+  coord_quickmap() +
+  labs(fill = "Mean Temperature of The Coldest Quarter (°C)")+
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
+# Plot together
+plot_grid(bio10_plot, bio11_plot)
+```
 
 ## 3. Integrated Species Distribution Model
 
