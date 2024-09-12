@@ -53,3 +53,12 @@ rsconnect/
 
 # zip-files
 *.zip
+
+# rda files
+*.rda
+*.tif
+*.geojson
+
+
+# RStudio Connect folder
+main_files/
