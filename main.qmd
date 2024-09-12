@@ -28,17 +28,17 @@ This report documents the different steps in the mayfly case study, created for 
 
 ### Species distribution modelling
 
-The aim of the project is to investigate how species distribution models can be used with different data types (presence-only, presence-absence, occurrence), and how the inclusion of both "good" and "less informative" data impact possible future predictions of species distribution. The R package pointedSDMs "[https://CRAN.R-project.org/package=PointedSDMs](https://cran.r-project.org/package=PointedSDMs)" by Mostert & O'hara is used for species distribution modelling.
+The aim of the project is to investigate how species distribution models can be used with different data types (presence-only, presence-absence, occurrence), and how the inclusion of both "good" and "less informative" data impact possible future predictions of species distribution. The R package `pointedSDMs` "[https://CRAN.R-project.org/package=PointedSDMs](https://cran.r-project.org/package=PointedSDMs)" by Mostert & O'Hara (2023) is used for species distribution modelling.
 
 ### Study organism
 
-The case study will focus on the mayfly species *Baetis rhodani* , also called the Large dark olive mayfly. Nymphs of *B. rhodani* is commonly found in running waters all over Norway (Artsdatabanken, 2021) and can also be found in most of Western-Europe. *B. rhodani* adults are winged and inhabit the terrestrial habitat for a limited time in order to reproduce. They cannot feed in their adult stage, so their life on land is short - typically lasting a few days. Not many studies have measured the dispersal distance of adult Mayflies. A study from 2021 aggregating flying distances for EPTs (Arce et al., 2021) cite only one study for *B. rhodani*, which had measured adults flying more than 3700 meters (Bagge, 1995).
+The case study will focus on the mayfly species *Baetis rhodani* , also called the Large Dark Olive Mayfly. Nymphs of *B. rhodani* is commonly found in running waters all over Norway (Artsdatabanken, 2021) and can also be found in most of Western-Europe. *B. rhodani* adults are winged and inhabit the terrestrial habitat for a limited time in order to reproduce. They cannot feed in their adult stage, so their life on land is short - typically lasting a few days. Not many studies have measured the dispersal distance of adult Mayflies. A study from 2021 aggregating flying distances for EPTs (Arce et al., 2021) cite only one study for *B. rhodani*, which had measured adults flying more than 3700 meters (Bagge, 1995).
 
-We assume that most of the *B. rhodani* datapoints from Norway originate from aquatic sampling, which for some datasets can be verified (ie., the NTNU University Museum) and for others inferred based on proximity to the river network. Some adult Mayfiles may also show up in the dataset. This will be handled... (add text here).
+We assume that most of the *B. rhodani* datapoints from Norway originate from aquatic sampling, which for some datasets can be verified (ie., the NTNU University Museum).
 
 ### Data
 
-Mayfly data is accessed through the Global Biodiversity Information Facility (GBIF, ref). Norway is selected as study area, due to the availability of both high-quality species occurrence data (NTNU University Museum) and presence-only data from national monitoring and research. Easily accessible physical, climatic and geographical data also makes Norway a good case-study.
+Mayfly data is accessed through the Global Biodiversity Information Facility (GBIF, 2024). Norway is selected as study area, due to the availability of both high-quality species occurrence data (NTNU University Museum) and presence-only data from national monitoring and research. Easily accessible physical, climatic and geographical data also makes Norway a good case-study.
 
 # Workflow
 
@@ -55,11 +55,11 @@ source(here::here("code","0_setup.R"))
 
 ### 1.1. Create download request for *Baetis rhodani* data from GBIF
 
-In this project, we use data on the mayfly *Baetis rhodani* accessed via GBIF. The GBIF infrastructure provides several options for data download, which all require a GBIF user. Creating a user is free and open for all. Searching for and downloading data can be done via the GBIF website (link here), or it can be done via R using the "rgbif" package. We will demonstrate the latter, at it improves reproducibility.
+In this project, we use data on the mayfly *Baetis rhodani* accessed via GBIF. The GBIF infrastructure provides several options for data download, which all require a GBIF user. Creating a user is free and open for all. Searching for and downloading data can be done via the GBIF website, or it can be done via R using the `rgbif` package. We will demonstrate the latter, at it improves reproducibility.
 
 First, a download request is created. This is shown in the script `1_1_GBIF_download.R`. Here we specify the download criteria:
 
--   Species: Baetis rhodani (Pictet, 1843)
+-   Species: *Baetis rhodani* (Pictet, 1843)
 
 -   Global administrative area: Norway
 
@@ -67,7 +67,7 @@ First, a download request is created. This is shown in the script `1_1_GBIF_down
 
 -   Year range: 1950-current
 
-Then, the data is imported and saved as "insectdata.rda".
+Then, the data is imported and saved as `insectdata.rda`.
 
 ### 1.2. GBIF download using dataset key
 
@@ -77,7 +77,7 @@ Creating a download request from GBIF only needs to be done once. Afterwards, th
 
 Before looking into the different sources and "quality levels" of the data, in the dataset, we first clean the downloaded dataset: removing data points with flagged coordinates, temporal outliers, and low coordinate precision (\>1km). The full cleaning procedure is provided in more detail in the script `1_3_GBIF_data_cleaning.R`.
 
-#### Procedure (simplified):
+#### Procedure outline:
 
 -   Visualize the raw data
 
@@ -124,18 +124,6 @@ ggplot() +
              size = 0.5) +
   coord_quickmap() +
   theme_classic()
-```
-
-```{r coord_summary}
-
-# Read data in 
-load(here("data", "derived_data" ,"coordinate_uncertainty_df.Rda"))
-
-# Which Coordinate uncertainty value is most common?
-sorted_value_counts <- sort(coordinate_uncertainty_df, decreasing = TRUE)
-
-# Create table of the frequency of each cooridinate uncertainty
-rmarkdown::paged_table(data.frame(sorted_value_counts))
 ```
 
 ### 1.4. Data exploration
@@ -203,9 +191,9 @@ Another distinct feature of the data, is the fact that NTNU university museum sa
 
 ### 1.5. Creating presence-absence dataset
 
-From inspecting the cleaned dataset, we see that both the Environmental Agency and NINA are missing information on the sampling protocol. By comparison, the NTNU University Museum provides reliable information about the sampling method for nearly all samples (14173 of 14184 occurrences), sampling duration- and area (mostly), as well as individual counts, sampling duration- and area (mostly), and individual counts.
+From inspecting the cleaned dataset, we see that both the Environmental Agency and NINA are missing information on the sampling protocol. By comparison, the NTNU University Museum provides reliable information about the sampling method for nearly all samples (14173 of 14184 occurrences), sampling duration- and area (mostly) and individual counts.
 
-On the basis of this, we propose that the Environmental Agency and NINA data, together with the data from smaller providers, be treated as presence-only date, while the NTNU University Museum dataset has enough structure for us to construct a presence-absence dataset, given comparable samples taken with the same protocol where *B. rhodani* is absent.
+On the basis of this, we propose that the Environmental Agency and NINA data, together with the data from smaller providers, be treated as presence-only data. However, the NTNU University Museum dataset has enough structure for us to construct a presence-absence dataset, given comparable samples taken with the same protocol where *B. rhodani* is absent.
 
 In order to find these, we can look at the `datasetKey` column in the dataset, and make a new GBIF request based on that. As it turns out, nearly all the samples from the NTNU Science Museum originate from a single dataset, the [Freshwater benthic invertebrates ecological collection](https://www.gbif.org/dataset/33591b80-0e31-480c-82ce-2f57211b10e6).
 
@@ -234,15 +222,9 @@ ggplot() +
   theme_minimal()
 ```
 
-# CORINE land cover
-
-To map the distribution of *B. rhodani*, we use the CORINE Land Cover (CLC) Status 2018 product. CLC has a resolution of 100m x 100m and contains 44 land cover classes. For the purposes of our analysis, the 44 original classes were aggregated into the 10 classes below. Here, we plotted the land cover across Norway as detected by the CLC Status 2018 layer.
-
-![](images/corine_2018_norway.png)
-
 # WORLDCLIM environmental variables
 
-We also used the Worldclim bioclimatic variables to map the distribution of *B. rhodani.* Specifically, we used bioclim10, Mean Temperature of The Warmest Quarter, and bioclim11, Mean Temperature of The Coldest Quarter at a 30 arc second resolution (\~ 1km\^2). Below, we plotted the distribution of the bio10 and bio11 values across Norway.
+We used the Worldclim bioclimatic variables to map the distribution of *B. rhodani.* Specifically, we used bioclim10 (Mean Temperature of The Warmest Quarter) and bioclim11 (Mean Temperature of The Coldest Quarter) at a 30 arc second resolution (\~ 1km\^2). Below, we plotted the distribution of the bio10 and bio11 values across Norway. These particular variables were chosen due to their assumed impact on water temperature, as water temperature is known to be important for *B. rhodani* development. Preliminary analysis revealed a low correlation value between the two climate variables (
 
 ![](images/bio10_norway.png)
 
@@ -299,6 +281,8 @@ Manual reference list
 -   Artsdatabanken (2021). **Vanlig smådøgnflue *Baetis rhodani* (Pictet, 1843-45).** Retrieved 13.05.2024. <https://artsdatabanken.no/Taxon/Baetis%20rhodani/49481>
 
 -   Bagge, P. (1995). Emergence and upstream flight of lotic mayflies and caddisflies (Ephemeroptera and Trichoptera) in a lake outlet, central Finland. *Entomologica Fennica*, *6*(2-3), 91--97. https://doi.org/10.33338/ef.83844
+
+-   GBIF.org (2024), GBIF Home Page. Available from: [https://www.gbif.or](https://www.gbif.org/)g.
 
 -   Peredo Arce, A., Hörren, T., Schletterer, M., & Kail, J. (2021). How far can EPTs fly? A comparison of empirical flying distances of riverine invertebrates and existing dispersal metrics. *Ecological Indicators*, *125*, 107465. https://doi.org/10.1016/j.ecolind.2021.107465
 
