@@ -7,7 +7,7 @@
 # 1. CUT BIOCLIMATIC VARIABLES TO NORWAY ---------------------------------------
 
 # Download bioclimatic variables
-bioclim <- worldclim_global(var='bio', res=30, path=here("data", "source_data"))
+bioclim <- worldclim_global(var='bio', res=0.5, path=here("data", "source_data"))
 
 # Load bioclimatic variables
 bioclim10 <- bioclim$wc2.1_30s_bio_10 # mean temp warmest quarter
@@ -77,3 +77,5 @@ bio10_map <- ggplot()+
 # Save to file
 ggsave(here("figures", "bio10_norway.png"),
        width=13, height=9)
+
+# 3. CHECK CORRELATION ---------------------------------------------------------
