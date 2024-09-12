@@ -138,17 +138,16 @@ sorted_value_counts <- sort(coordinate_uncertainty_df, decreasing = TRUE)
 rmarkdown::paged_table(data.frame(sorted_value_counts))
 ```
 
-Then, remove records with coordinate uncertainty \>1km and records with NA for coordinate uncertainty. 60 records were reomved as part of this filtering.
-
-Save the cleaned files. The cleaned dataset is now called insectdata_low_uncertainty (?).
-
 ### 1.4. Data exploration
 
-The cleaned data originates from different data providers. The 10 largest data sources are shown below, and we see that after The University Museum (NTNU-VM), The Environment Agency (miljodir) and The Norwegian Institute for Nature Research (NINA) are the instiutions providing the highest number of data points.
+The cleaned data originates from different data providers. The 10 largest data sources are shown below, and we see that after The University Museum (`NTNU-VM`), The Environment Agency (`miljodir`) and the Norwegian Institute for Nature Research (`NINA`) are the institutions providing the highest number of data points, as shown in @fig-institution-barplot.
 
-```{r}
+```{r plot-institution-barplot}
+#| label: fig-institution-barplot
+#| layout-ncol: 1
+#| fig-cap: "Number of registered occurences from different data sources."
+#| truncate: true
 ###
-# THIS SECTION WILL BE REMOVED, AND WILL JUST RUN SEPARATE SCRIPT AND USE KNITR TO ADD FIGURE (having some issues)
 # Load cleaned insectdata
 load(here::here("data","derived_data","cleaned_insectdata.rda"))
 
@@ -171,7 +170,6 @@ df_institutions_barplot <- df_institutions %>%
   theme_classic()
 
 df_institutions_barplot
-###
 
 ```
 
@@ -242,23 +240,31 @@ To map the distribution of *B. rhodani*, we use the CORINE Land Cover (CLC) Stat
 
 ![](images/corine_2018_norway.png)
 
-# WORLDCLIM environmental variable
+# WORLDCLIM environmental variables
 
-We also used the Worldclim bioclimatic variables to map the distribution of *B. rhodani.* Specifically, we used bioclim10, Mean Temperature of The Warmest Quarter at a 30 arc second resolution (\~ 1km\^2). Below, we plotted the distribution of the bio10 values across Norway.
+We also used the Worldclim bioclimatic variables to map the distribution of *B. rhodani.* Specifically, we used bioclim10, Mean Temperature of The Warmest Quarter, and bioclim11, Mean Temperature of The Coldest Quarter at a 30 arc second resolution (\~ 1km\^2). Below, we plotted the distribution of the bio10 and bio11 values across Norway.
 
 ![](images/bio10_norway.png)
 
 ## 5. Integrated Species Distribution Model
 
-\[A few lines about how we set up the model\]. See the script `5_integrated_SDM.R` for more details.
+We set up the `INLA` raster to be used in the `pointedSDM` model according to the recommendations provided at \[kilde\], and using our own intuition to adjust the mesh coarseness in order to balance performance and accuracy given the amount and spread of the data provided. All environmental variables were centered and scaled to mean zero and unit variance, and four different models were specified, according to the study questions outlined above.
+
+\[A few lines about how we set up the model\].
+
+See the script `5_integrated_SDM.R` for more details.
 
 # Results and discussion
 
-\[say sometyhing (short) about the results of th SDMs and their interpretations.\]
+\[say something (short) about the results of th SDMs and their interpretations.\]
 
 ```{r SDMs}
 #| eval: false
 #| echo: false
+#| label: fig-institutions-points
+#| layout-ncol: 2
+#| fig-cap: "Predicted intensities of B. rhodani in Norway "
+#| truncate: true
 # Run SDM script(s)
 #source(here::here("code","5_integrated_SDM.R"))
 
@@ -268,31 +274,17 @@ load("data/model_fits/po_partial.rda")
 load("data/model_fits/pa_only.rda")
 load("data/model_fits/integrated.rda")
 
-# Extract summary of the model
-summary(modelRun_po_full)
-summary(modelRun_po_partial)
-summary(modelRun_pa_only)
-summary(modelRun_integrated)
-
-# Create a "region" from the shape of bio1_scaled
-#get extent of raster
-bio10_extent <- terra::ext(bio10_scaled)
-#create an sf polygon from the extent
-bio10_extent_sf <- st_as_sfc(st_bbox(c(bio10_extent[1], bio10_extent[2], 
-                                       bio10_extent[3], bio10_extent[4])), 
-                             crs = st_crs(bio10_scaled))
-#create "region" object
-region <- bio10_extent_sf
-
-# Create prediction plots
-predictions <- predict(modelRun_integrated, 
-                       mesh = Mesh,
-                       mask = Norway, 
-                       spatial = TRUE,
-                       fun = 'linear')
-
 # Plot the prediction
-plot(predictions)
+plot(pred_po_full)
+plot(pred_po_partial)
+plot(pred_pa_only)
+plot(pred_integrated)
+
+modelRun_po_full$summary.fixed
+modelRun_po_partial$summary.fixed
+modelRun_pa_only$summary.fixed
+modelRun_integrated$summary.fixed
+
 
 ```
 
