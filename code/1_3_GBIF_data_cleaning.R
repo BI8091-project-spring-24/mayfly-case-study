@@ -109,6 +109,7 @@ coordinate_uncertainty_df <- table(insectdata_no_flags$coordinateUncertaintyInMe
 View(coordinate_uncertainty_df)
 
 # Write the table to file
+dir.create(here("data","derived_data"), showWarnings = FALSE)
 save(coordinate_uncertainty_df,
      file = here::here("data","derived_data","coordinate_uncertainty_df.Rda"))
 
@@ -164,6 +165,5 @@ out.round <- cd_round(insectdata_cleaned_count, lon = "decimalLongitude",
 
 # Save cleaned df
 cleaned_insectdata <- insectdata_cleaned_count
-dir.create(here("data","derived_data"), showWarnings = FALSE)
 save(cleaned_insectdata, file = here("data","derived_data","cleaned_insectdata.rda"))
 
