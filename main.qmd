@@ -234,9 +234,11 @@ We set up the `INLA` raster to be used in the `pointedSDM` model according to th
 
 For more details on model set up and mesh adjustment, see the script `5_integrated_SDM.R`.
 
-# Results and discussion
+# Results
 
-\[say something (short) about the results of th SDMs and their interpretations.\]
+For each of the four models,
+
+Predictions of the likelihood of occurrence of B. rhodani were created for each of the four models, as seen in @fig-predictions.
 
 ```{r SDMs}
 #| eval: false
