@@ -243,9 +243,9 @@ See the script `5_integrated_SDM.R` for more details.
 ```{r SDMs}
 #| eval: false
 #| echo: false
-#| label: fig-institutions-points
+#| label: fig-predictions
 #| layout-ncol: 2
-#| fig-cap: "Predicted intensities of B. rhodani in Norway "
+#| fig-cap: "Predicted intensities of B. rhodani in Norway according to thed fitted model"
 #| truncate: true
 # Run SDM script(s)
 #source(here::here("code","5_integrated_SDM.R"))
