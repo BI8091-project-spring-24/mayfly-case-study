@@ -60,5 +60,7 @@ rsconnect/
 *.geojson
 
 
-# RStudio Connect folder
+# other_files
 main_files/
+figures/
+
