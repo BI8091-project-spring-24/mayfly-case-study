@@ -1,15 +1,13 @@
 ################################################################################
 
-# Running PointedSDMs
+# 3. Integrated SDM
 
 ################################################################################
 
-# 0. PACKAGES ----
+# Source packages
 source(here::here("code", "0_setup.R"))
 
-# 1. PREPARE DATA FOR POINTEDSDMS ----
-
-## 1.1. Load data ----
+# Prepare data for PointedSDMs -------------------------------------------------
 
 # Set options for the INLA package to use it "experimental" features
 bru_options_set(inla.mode = "experimental")
@@ -29,17 +27,13 @@ presence_absence_dataset <- events_NTNU
 bio10 <- terra::rast(here("data", "derived_data", "bio10_norway.tif"))
 bio11 <- terra::rast(here("data", "derived_data", "bio11_norway.tif"))
 
-# Read in land cover and distance to river rasters
-#corine2018 <- terra::rast(here("data", "derived_data", "corine_2018_modified_classes.tif"))
-#river_distance <- terra::rast(here("data", "derived_data", "distance_to_river_raster.tif")) # we're not using these right?
-
 # Normalize environmental varaibles  by scaling it
 bio10_scaled <- scale(bio10)
 bio11_scaled <- scale(bio11)
 #corine2018_scaled <- scale(corine2018)
 #river_distance_scaled <- scale(river_distance) # we're not using these right?
 
-## 1.2. Create mesh object ---- 
+# Create mesh object ----------------------------------------------------------- 
 
 # Credits for code: Philip Mostert
 # Set CRS
@@ -62,9 +56,7 @@ Mesh <- INLA::inla.mesh.2d(boundary = fm_sp2segment(Norway),
 
 
 
-# 2. RUN INTEGRATED SDM ----
-
-## 2.1. Prepare list with presence-only and presence-absence data ----
+# Define datasets --------------------------------------------------------------
 
 # Presence-only data - keep only X and Y coordinates (all data)
 presence_only_full <- presence_only |>
@@ -72,7 +64,7 @@ presence_only_full <- presence_only |>
   rename(Y = decimalLatitude,
          X = decimalLongitude)
 
-# presence-only excluding Vitenskapsmuseet
+# Presence-only excluding Vitenskapsmuseet
 presence_only_no_vm <- presence_only |>
   filter(institutionCode != "NTNU-VM") |>
   select(decimalLatitude, decimalLongitude) |>
@@ -90,9 +82,9 @@ presence_absence <- presence_absence_dataset |>
 b_rhodani <- list(NTNU = presence_absence,
                 Gbif = presence_only_no_vm)
 
-## 2.1. Run Integraded SDM ----
+# Run IntegradedSDM ------------------------------------------------------------
 
-# model covariates (add CORINE here)
+# Model covariates
 covars <- c(bio10_scaled, bio11_scaled)
 
 # Specify models -- here we run a model with one spatial covariate and a shared spatial field
@@ -120,7 +112,7 @@ model_integrated <- intModel(b_rhodani, spatialCovariates = c(bio10_scaled, bio1
 
 
 
-#### Run models and save predictions ####
+# Run models and save predictions ----------------------------------------------
 dir.create(here("data", "model_fits"), showWarnings = FALSE)
 
 # full presence-only

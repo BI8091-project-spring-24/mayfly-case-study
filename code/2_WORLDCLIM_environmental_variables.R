@@ -1,10 +1,10 @@
 ################################################################################
 
-# Cut environmental variables to Norway
+# 2. WORLDCLIM environmental variables
 
 ################################################################################
 
-# 1. CUT BIOCLIMATIC VARIABLES TO NORWAY ---------------------------------------
+# Cut bioclimatic variables to Norway ------------------------------------------
 
 # Download bioclimatic variables
 bioclim <- worldclim_global(var='bio', res=0.5, path=here("data", "source_data"))
@@ -40,7 +40,7 @@ terra::writeRaster(bio10_norway,
 terra::writeRaster(bio11_norway, 
                    here("data", "derived_data", "bio11_norway.tif"))
 
-# 2. CHECK CORRELATION ---------------------------------------------------------
+# Check correlations -----------------------------------------------------------
 
 # Convert rasters to dfs
 bio10_norway <- as.data.frame(bio10_norway, xy = TRUE)
