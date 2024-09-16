@@ -23,20 +23,20 @@ projection <- "+proj=longlat +ellps=WGS84"
 
 # Extract species occurrence records
 presence_only <- cleaned_insectdata
-presence_absence <- events_NTNU
+presence_absence_dataset <- events_NTNU
 
 # Read in climate data
 bio10 <- terra::rast(here("data", "derived_data", "bio10_norway.tif"))
 bio11 <- terra::rast(here("data", "derived_data", "bio11_norway.tif"))
 
 # Read in land cover and distance to river rasters
-corine2018 <- terra::rast(here("data", "derived_data", "corine_2018_modified_classes.tif"))
+#corine2018 <- terra::rast(here("data", "derived_data", "corine_2018_modified_classes.tif"))
 #river_distance <- terra::rast(here("data", "derived_data", "distance_to_river_raster.tif")) # we're not using these right?
 
 # Normalize environmental varaibles  by scaling it
 bio10_scaled <- scale(bio10)
 bio11_scaled <- scale(bio11)
-corine2018_scaled <- scale(corine2018)
+#corine2018_scaled <- scale(corine2018)
 #river_distance_scaled <- scale(river_distance) # we're not using these right?
 
 ## 1.2. Create mesh object ---- 
@@ -88,7 +88,7 @@ presence_absence <- presence_absence_dataset |>
 
 # Create list with the two datasets
 b_rhodani <- list(NTNU = presence_absence,
-                Gbif = presence_only)
+                Gbif = presence_only_no_vm)
 
 ## 2.1. Run Integraded SDM ----
 
@@ -150,14 +150,3 @@ modelRun_integrated <- fitISDM(model_integrated,
 pred_integrated <- predict(modelRun_integrated, mesh = Mesh,
                         mask = Norway, spatial = TRUE, fun = 'linear')
 save(modelRun_integrated, pred_integrated, file = here("data","model_fits","integrated.rda"))
-
-#### do we need this – i'm thinking just loading the prediction objects in the main file ####
-# Create a "region" from the shape of bio1_scaled
-#get extent of raster
-bio10_extent <- terra::ext(bio10_scaled)
-#create an sf polygon from the extent
-bio10_extent_sf <- st_as_sfc(st_bbox(c(xmin = bio10_extent[1], xmax = bio10_extent[2], 
-                                      ymin = bio10_extent[3], ymax = bio10_extent[4])), 
-                            crs = st_crs(bio10_scaled))
-#create "region" object
-region <- bio10_extent_sf
