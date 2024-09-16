@@ -191,13 +191,13 @@ Another distinct feature of the data, is the fact that NTNU university museum sa
 
 ### 1.5. Creating presence-absence dataset
 
-From inspecting the cleaned dataset, we see that both the Environmental Agency and NINA are missing information on the sampling protocol. By comparison, the NTNU University Museum provides reliable information about the sampling method for nearly all samples (14173 of 14184 occurrences), sampling duration- and area (mostly), as well as individual counts, sampling duration- and area (mostly), and individual counts.
+From inspecting the cleaned dataset, we see that both the Environmental Agency and NINA are missing information on the sampling protocol. By comparison, the NTNU University Museum provides reliable information about the sampling method for nearly all samples (14173 of 14184 occurrences), as well as individual counts, sampling duration- and area (mostly), and individual counts.
 
 On the basis of this, we propose that the Environmental Agency and NINA data, together with the data from smaller providers, be treated as presence-only data. However, the NTNU University Museum dataset has enough structure for us to construct a presence-absence dataset, given comparable samples taken with the same protocol where *B. rhodani* is absent.
 
 In order to find these, we can look at the `datasetKey` column in the dataset, and make a new GBIF request based on that. As it turns out, nearly all the samples from the NTNU Science Museum originate from a single dataset, the [Freshwater benthic invertebrates ecological collection](https://www.gbif.org/dataset/33591b80-0e31-480c-82ce-2f57211b10e6).
 
-We created a new download request with the same parameters as in 1.1., and filtered it to only contain samples obtained with sampling methods suitable for catching *B. rhodani*. Details on this procedure can be found in the script `1_5_GBIF_presence_absence_dataset.R`.
+We created a new download request with the same parameters as in 1.1., except not restricted to *B. rhodani*, and filtered it to only contain samples obtained with sampling methods suitable for catching *B. rhodani*. Details on this procedure can be found in the script `1_5_GBIF_presence_absence_dataset.R`.
 
 ```{r plot-presence_absence}
 #| label: fig-presence_absence
