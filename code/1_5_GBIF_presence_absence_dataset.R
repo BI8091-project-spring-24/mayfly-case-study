@@ -1,10 +1,10 @@
-#############################################
+################################################################################
 
 # Create presence/absence file 
 
-############################################
+################################################################################
 
-# Download NTNU dataset ----
+# Download NTNU dataset --------------------------------------------------------
 
 # Searched for the dataset in GBIF, create a download request, date 22.04.024
 
@@ -22,7 +22,7 @@ occurrences_NTNU <- occ_download_get(occurrences_NTNU_download) %>%
   occ_download_import()
 
 
-# Creating presence absence for B rhodani ----
+# Creating presence absence for B rhodani --------------------------------------
 
 # Keep occurrences with sampling methods: Kick-sampling, surber-sampling.
 # These methods are suitable in running waters, and common.
