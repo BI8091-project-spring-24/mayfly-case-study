@@ -1,10 +1,10 @@
-#############################################
+################################################################################
 
-# Create presence/absence file 
+# 1.5 GBIF presence absence dataset
 
-############################################
+################################################################################
 
-# Download NTNU dataset ----
+# Download NTNU dataset --------------------------------------------------------
 
 # Searched for the dataset in GBIF, create a download request, date 22.04.024
 
@@ -22,7 +22,7 @@ occurrences_NTNU <- occ_download_get(occurrences_NTNU_download) %>%
   occ_download_import()
 
 
-# Creating presence absence for B rhodani ----
+# Creating presence absence for B rhodani --------------------------------------
 
 # Keep occurrences with sampling methods: Kick-sampling, surber-sampling.
 # These methods are suitable in running waters, and common.
@@ -62,7 +62,7 @@ events_NTNU$decimalLatitude <- as.numeric(events_NTNU$decimalLatitude)
 events_NTNU$decimalLongitude <- as.numeric(events_NTNU$decimalLongitude)
 save(events_NTNU,file = here::here("data","derived_data","presence_absence_dataset.Rda"))
 
-# Map of presences and absences ----
+# Map of presences and absences ------------------------------------------------
 
 # Download map of Norway
 norway <- geodata::gadm(country = "NOR", level = 0, 
