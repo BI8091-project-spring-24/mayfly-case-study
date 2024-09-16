@@ -1,7 +1,18 @@
 ---
 title: "A protocol for GBIF data exploration and filtering for Integrated Species Distribution Models - with a practical example"
 bibliography: bibliography.bib
-format: html
+author: 
+  - "Hanne Bjørnås Krogstie"
+  - "Audun Rugstad"
+  - "Beatrice Trascau"
+warning: false
+format:
+  pdf:
+    documentclass: article
+    header-includes:
+      - \usepackage{ragged2e}
+      - \RaggedRight
+    fig-pos: "H"
 editor: visual
 ---
 
@@ -100,6 +111,8 @@ The cleaned data is visualized in @fig-coords, with points removed in the cleani
 
 ```{r plot-cleaned}
 #| label: fig-coords
+#| echo: false
+#| warning: false
 #| layout-ncol: 1
 #| fig-cap: "Coordinates for the cleaned occurrences (blue, $N=23434$) of B. Rhodani in Norway, and removed points (red, $N=124$)."
 #| truncate: true
@@ -133,6 +146,7 @@ The cleaned data originates from different data providers. The 10 largest data s
 
 ```{r plot-institution-barplot}
 #| label: fig-institution-barplot
+#| echo: false
 #| layout-ncol: 1
 #| fig-cap: "Number of registered occurences from different data sources."
 #| truncate: true
@@ -166,6 +180,7 @@ As visualized in @fig-institutions-points, the *B. rhodani* data points are dist
 
 ```{r plot-institutions}
 #| label: fig-institutions-points
+#| echo: false
 #| layout-ncol: 1
 #| fig-cap: "Coordinates for the samples provided by the the largest data providers in the study: The NTNU University Museum (NTNU-VM), the Norwegian Environmental Agency (miljodir) and the Norwegian Institute for Nature Research (NINA)."
 #| truncate: true
@@ -202,6 +217,7 @@ We created a new download request with the same parameters as in 1.1., except no
 
 ```{r plot-presence_absence}
 #| label: fig-presence_absence
+#| echo: false
 #| layout-ncol: 1
 #| fig-cap: "Plot of presences/absences (1/0) of _B. Rhodani_ from the NTNU Freshwater benthic invertebrates ecological collection, filtered by samples taken with comparable sampling protocols."
 
@@ -231,6 +247,7 @@ In this report, we chose to include WORLDCLIM 10 and 11 as predictor variables t
 
 ```{r plot worldclim}
 #| label: fig-worldclim
+#| echo: false
 #| layout-ncol: 1
 #| fig-cap: "Plot of Mean Temperature of The Warmest Quarter (Bio10) and Mean Temperature of The Coldest Quarter (Bio11) across Norway"
 
@@ -307,7 +324,9 @@ plot(pred_integrated)
 
 ```
 
-```{r}
+```{r SDM-summaries}
+#| eval: false
+#| echo: false
 modelRun_po_full$summary.fixed
 modelRun_po_full$summary.hyperpar
 modelRun_po_partial$summary.fixed
@@ -320,6 +339,8 @@ modelRun_integrated$summary.hyperpar
 
 # Model interpretation and discussion
 
+## Assessment of model fit
+
 Due to the fact that all models were fitted to different data sets, direct comparison of model likelihood and goodness-of-fit metrics such as AIC and BIC were not possible.
 
 However, as seen in @fig-predictions, it's clear that the two presence-only models give a much higher range of predicted intensities and coefficient estimates for the effect of the bioclimatic variables. This might be indicative of poor model fit, which warning of model divergence given by the fitISDM() function also support. \[difference between the two models\]
@@ -327,6 +348,16 @@ However, as seen in @fig-predictions, it's clear that the two presence-only mode
 The presence-absence model converged very quickly and gave coefficient estimates that seemed more reasonably constrained. However, the variation in the predicted intensities were clearly higher within Trøndelag county than for the rest of Norway, likely reflecting the regional bias in the dataset.
 
 Finally, the integrated model both seemed to give more "reasonable values" for the predicted intensities than the two presence-only models, as well as a higher coverage of Norway than the presence-absence model.
+
+## Biological interpretation
+
+All the models, with the partial exception of the presence-absence model, generally showed a similar pattern of predicted intensities [see @fig-predictions]. However, we assume that the integrated model is the best performing model, therefore our biological interpretation is primarily based on that.
+
+From the predicted intensities in the integrated model, *Baetis rhodani* seem to prefer areas that are not too warm during summer (higher intensity  where bio10 is low), and cold during winter (higher intensity where bio11 is low).
+
+A negative association with high summer temperatures could be due to lower oxygen saturation in warmer waters. Further, a positive association with cold winter temperatures could imply that *B. rhodani* prefer areas with stable winter conditions where for instance ice cover is permanent during winter months.
+
+Areas of highest intensity overlap with the central mountain regions in southern Norway and northern Norway. However, it is important to note that areas with low predicted intensities overlap with highly populated areas of Norway. Therefore, our results could also suggest that the intensity of distribution of *B. rhodani* is also determined by other factors, such as land-use intensity, water temperature, water body size etc. We recommend that future studies model the distribution of *B. rhodani* in relation to climate as well as the aforementioned factors.
 
 ## Conclusion
 
@@ -344,6 +375,9 @@ Overall, our preliminary results suggest that integration of the two dataset typ
 ## R resources
 
 ```{r}
+#| echo: false
+#| code-overflow: wrap
+options(width = 20)
 # Citing all packages used, including the package versions.
 report::cite_packages()
 ```
