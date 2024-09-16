@@ -122,3 +122,4 @@ presence_absence_map <- plot_grid(presence_absence_map_no_legend, legend,
 # Save to file
 ggsave(here("figures", "presence_absence_map.png"),
        width=13, height=9)
+

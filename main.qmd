@@ -312,18 +312,16 @@ modelRun_pa_only$summary.fixed
 modelRun_pa_only$summary.hyperpar
 modelRun_integrated$summary.fixed
 modelRun_integrated$summary.hyperpar
-
-
 ```
 
 # Model interpretation and discussion
+
+
 
 # Bibliography
 
 ::: {#refs}
 :::
-
-/li
 
 Manual reference list
 
