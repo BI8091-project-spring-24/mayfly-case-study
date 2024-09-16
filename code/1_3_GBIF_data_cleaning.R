@@ -9,9 +9,7 @@
 # removed box download, since we already will have downloaded the data in an earlier script
 load(here("data", "source_data", "insectdata.rda"))
 
-# Clean GBIF records -----------------------------------------------------------
-
-## Inspect data ----------------------------------------------------------------
+# Inspect data -----------------------------------------------------------------
 
 # Download world map 
 wm <- borders("world", colour = "lightgrey", fill = "lightgrey")
@@ -35,7 +33,7 @@ dir.create(here("figures"), showWarnings = FALSE)
 ggsave(here("figures", "insect_records_world_map.png"),
        width=13, height=9)
 
-## Remove records with problematic coordinates ---------------------------------
+# Remove records with problematic coordinates ----------------------------------
 
 # Extract coordinate flags
 coord_flags <- clean_coordinates(x = insectdata,
@@ -67,7 +65,7 @@ ggsave(here("figures", "flagged_insect_records.png"),
 # Exclude flagged records
 insectdata_coords <- insectdata[coord_flags$.summary, ]
 
-## Remove records with temporal outliers ---------------------------------------
+# Remove records with temporal outliers ----------------------------------------
 
 # Test for temporal outliers on taxon level
 time_flags <- cf_age(x = insectdata_coords,
@@ -82,8 +80,6 @@ time_flags <- cf_age(x = insectdata_coords,
 insectdata_no_flags <- insectdata_coords[time_flags, ]  
 
 # Improve data quality with metadata -------------------------------------------
-
-## Coordinate precision --------------------------------------------------------
 
 # Boxplot of coordinate precision in insect data
 coord_uncertainty_plot <- ggplot(insectdata_no_flags, 
@@ -122,8 +118,6 @@ insectdata_low_uncertainty <- insectdata_no_flags |>
 nrow(insectdata_no_flags) #23547
 nrow(insectdata_low_uncertainty)#23487 (removed 60 records - not so bad)
 
-## Data sources ----------------------------------------------------------------
-
 # Check basis of record in df
 table(insectdata_low_uncertainty$basisOfRecord)
 
@@ -145,8 +139,7 @@ table(insectdata_cleaned_count$taxonRank) #Species: 23434, Unranked: 17
 insectdata_cleaned_count <- insectdata_cleaned_count |>
   filter(!taxonRank == "UNRANKED")
 
-
-## Remove problematic datasets -------------------------------------------------
+# Remove problematic datasets --------------------------------------------------
 
 # Identify datasets with ddmm to dd.dd conversion error 
 out.ddmm <- cd_ddmm(insectdata_cleaned_count, lon = "decimalLongitude", 

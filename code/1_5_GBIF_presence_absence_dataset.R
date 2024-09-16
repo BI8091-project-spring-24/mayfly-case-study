@@ -62,7 +62,7 @@ events_NTNU$decimalLatitude <- as.numeric(events_NTNU$decimalLatitude)
 events_NTNU$decimalLongitude <- as.numeric(events_NTNU$decimalLongitude)
 save(events_NTNU,file = here::here("data","derived_data","presence_absence_dataset.Rda"))
 
-# Map of presences and absences ----
+# Map of presences and absences ------------------------------------------------
 
 # Download map of Norway
 norway <- geodata::gadm(country = "NOR", level = 0, 
