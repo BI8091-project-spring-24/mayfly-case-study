@@ -9,7 +9,7 @@ editor: visual
 
 Modern ecological research is increasingly coming to be characterized by the use of large, multi-source data sets from open-access online repositories - with the infrastructure provided by the Global Biodiversity Information Facility (GBIF) as perhaps the most prominent example. These "big data" on species occurrences are often used to inform species distribution models. However, the fact that the data resulting from a single GBIF query (or a similar repository) often come from widely different sources, with different levels of sampling structure, information on species absences etc., remains a challenge.
 
-Recent advances in species distribution modelling, exemplified with the release of the `R` package `pointedSDM` (Mostert & O'Hara, 2023), does increasingly allow for the combination of multiple species occurrence data sets with different levels of sample information (i.e. presence-only, presence-absence, counts etc), into a single integrated model (iSDM). Still, practical and actionable advice for how to best obtain, validate and prepare this differentiated data from an online repository, seems to be comparatively lacking in the literature.
+Recent advances in species distribution modelling, exemplified with the release of the `R` package `pointedSDM` [@mostert_pointedsdms_2023], does increasingly allow for the combination of multiple species occurrence data sets with different levels of sample information (i.e. presence-only, presence-absence, counts etc), into a single integrated model (iSDM). Still, practical and actionable advice for how to best obtain, validate and prepare this differentiated data from an online repository, seems to be comparatively lacking in the literature.
 
 In this report, we aim to address this issue by demonstrating a suggestion for a complete and reproducible workflow for data download, cleaning, exploration and differentiating, from a simple GBIF query to fitting an integrated SDM with the `pointedSDM` package.
 
@@ -29,17 +29,17 @@ This report documents the different steps in the mayfly case study, created for 
 
 ### Species distribution modelling
 
-The aim of the project is to investigate how species distribution models can be used with different data types (presence-only, presence-absence, occurrence), and how the inclusion of both "good" and "less informative" data impact possible future predictions of species distribution. The R package `pointedSDMs` "[https://CRAN.R-project.org/package=PointedSDMs](https://cran.r-project.org/package=PointedSDMs)" by Mostert & O'Hara (2023) is used for species distribution modelling.
+The aim of the project is to investigate how species distribution models can be used with different data types (presence-only, presence-absence, occurrence), and how the inclusion of both "good" and "less informative" data impact possible future predictions of species distribution. The R package `pointedSDMs` ([https://CRAN.R-project.org/package=PointedSDMs](https://cran.r-project.org/package=PointedSDMs)) by Mostert & O'Hara (2023) is used for species distribution modelling.
 
 ### Study organism
 
-The case study will focus on the mayfly species *Baetis rhodani*, also called the Large Dark Olive Mayfly. Nymphs of *B. rhodani* is commonly found in running waters all over Norway (Artsdatabanken, 2021) and can also be found in most of Western Europe. *B. rhodani* adults are winged and inhabit the terrestrial habitat for a limited time in order to reproduce. They cannot feed in their adult stage, so their life on land is short - typically lasting a few days. Not many studies have measured the dispersal distance of adult Mayflies. A study from 2021 aggregating flying distances for EPTs (Peredo Arce et al., 2021) cite only one study for *B. rhodani*, which had measured adults flying more than 3700 meters (Bagge, 1995).
+The case study will focus on the mayfly species *Baetis rhodani*, also called the Large Dark Olive Mayfly. Nymphs of *B. rhodani* is commonly found in running waters all over Norway [@artsdatabanken_vanlig_2021] and can also be found in most of Western Europe. *B. rhodani* adults are winged and inhabit the terrestrial habitat for a limited time in order to reproduce. They cannot feed in their adult stage, so their life on land is short - typically lasting a few days. Not many studies have measured the dispersal distance of adult Mayflies. A study from 2021 aggregating flying distances for EPTs [@peredo_arce_how_2021] cite only one study for *B. rhodani*, which had measured adults flying more than 3700 meters [@bagge_emergence_1995].
 
 We assume that most of the *B. rhodani* datapoints from Norway originate from aquatic sampling, which for some datasets can be verified (i.e. in the case of the NTNU University Museum).
 
 ### Data
 
-Mayfly data is accessed through the Global Biodiversity Information Facility (GBIF, 2024). Norway is selected as study area, due to the availability of both high-quality species occurrence data (NTNU University Museum) and presence-only data from national monitoring and research. Easily accessible physical, climatic and geographical data also makes Norway a good case study.
+Mayfly data is accessed through the Global Biodiversity Information Facility [@gbif_gbif_2024]. Norway is selected as study area, due to the availability of both high-quality species occurrence data (NTNU University Museum) and presence-only data from national monitoring and research. Easily accessible physical, climatic and geographical data also makes Norway a good case study.
 
 # Workflow
 
@@ -227,15 +227,15 @@ ggplot() +
 
 We used the Worldclim bioclimatic variables to map the distribution of *B. rhodani.* Specifically, we used bioclim10 (Mean Temperature of The Warmest Quarter) and bioclim11 (Mean Temperature of The Coldest Quarter) at a 30 arc second resolution (\~ 1km\^2). Below, we plotted the distribution of the bio10 and bio11 values across Norway. These particular variables were chosen due to their assumed impact on water temperature, as water temperature is known to be important for *B. rhodani* development. Preliminary analysis revealed a significant but moderate correlation value between the two climate variables (r = 0.559, t(877822) = 631, p \< 0.001). Therefore, the two variables were used in the SDMs.
 
-In this report, we chose to include WORLDCLIM 10 and 11 as predictor variables to our iSDM. In order to predict the distribution of *Baetis rhodani*, it could also be of interest to include land cover data (i.e, CORINE land cover data, ref) or distance to rivers (i.e. using the river network dataset provided by NVE, ref). More details on the procedure are detailed in the script `2_WORLDCLIM_environmental_variables.R`.
+In this report, we chose to include WORLDCLIM 10 and 11 as predictor variables to our iSDM. In order to predict the distribution of *Baetis rhodani*, it could also be of interest to include land cover data (i.e, CORINE land cover data, @european_environment_agency_eea_corine_2018) or distance to rivers (i.e. using the river network dataset provided by NVE, @nve2020). More details on the procedure are detailed in the script `2_WORLDCLIM_environmental_variables.R`.
 
 ```{r plot worldclim}
 #| label: fig-worldclim
 #| layout-ncol: 1
-#| fig-cap: "Plot of Mean Temperature of The Warmest Quarter and Mean Temperature of The Coldest Quarter across Norway"
+#| fig-cap: "Plot of Mean Temperature of The Warmest Quarter (Bio10) and Mean Temperature of The Coldest Quarter (Bio11) across Norway"
 
-load("data/source_data/wc2.1_30s/wc2.1_30s_bio_10.tif")
-load("data/source_data/wc2.1_30s/wc2.1_30s_bio_11.tif")
+bio10_norway <- rast("data/derived_data/bio10_norway.tif")
+bio11_norway <- rast("data/derived_data/bio11_norway.tif")
 
 # Convert rasters to data frames for ggplot
 bio10_norway_df <- as.data.frame(bio10_norway, xy = TRUE)
@@ -244,18 +244,20 @@ bio11_norway_df <- as.data.frame(bio11_norway, xy = TRUE)
 # Plot for bio10
 bio10_plot <- ggplot(data = bio10_norway_df) +
   geom_raster(aes(x = x, y = y, fill = wc2.1_30s_bio_10)) + 
-  borders(database = "world", regions = "Norway(?!:Svalbard)", colour = "gray70") +
+  borders(database = "world", regions = "Norway(?!:Svalbard)", colour = "gray70",
+          xlim=c(4.5, 32)) +
   coord_quickmap() +
-  labs(fill = "Mean Temperature of The Warmest Quarter (°C)")+
+  labs(fill = "Bio10 (°C)")+
   theme_minimal() +
   theme(legend.position = "bottom")
 
 # Plot for bio11
 bio11_plot <- ggplot(data = bio11_norway_df) +
   geom_raster(aes(x = x, y = y, fill = wc2.1_30s_bio_11)) + 
-  borders(database = "world", regions = "Norway(?!:Svalbard)", colour = "gray70") +
+  borders(database = "world", regions = "Norway(?!:Svalbard)", colour = "gray70",
+          xlim=c(4.5, 32)) +
   coord_quickmap() +
-  labs(fill = "Mean Temperature of The Coldest Quarter (°C)")+
+  labs(fill = "Bio11 (°C)")+
   theme_minimal() +
   theme(legend.position = "bottom")
 
@@ -265,7 +267,7 @@ plot_grid(bio10_plot, bio11_plot)
 
 ## 3. Integrated Species Distribution Model
 
-We set up the `INLA` raster to be used in the `pointedSDM` model according to the recommendations provided at (Mostert & O'Hara, 2023). Mesh coarseness was adjusted in order to balance performance and accuracy given the amount and spread of the data provided. All environmental variables were centered and scaled to mean zero and unit variance, and four different models were specified, according to the study questions outlined above.
+We set up the `INLA` raster to be used in the `pointedSDM` model according to the recommendations provided by Mostert & O'Hara (2023). Mesh coarseness was adjusted in order to balance performance and accuracy given the amount and spread of the data provided. All environmental variables were centered and scaled to mean zero and unit variance, and four different models were specified, according to the study questions outlined above.
 
 For more details on model set up and mesh adjustment, see the script `3_integrated_SDM.R`.
 
@@ -318,40 +320,28 @@ modelRun_integrated$summary.hyperpar
 
 # Model interpretation and discussion
 
-Due to the fact that all models were fitted to different datasets, direct comparison of model likelihood and goodness-of-fit metrics such as AIC and BIC were not possible.
+Due to the fact that all models were fitted to different data sets, direct comparison of model likelihood and goodness-of-fit metrics such as AIC and BIC were not possible.
 
 However, as seen in @fig-predictions, it's clear that the two presence-only models give a much higher range of predicted intensities and coefficient estimates for the effect of the bioclimatic variables. This might be indicative of poor model fit, which warning of model divergence given by the fitISDM() function also support. \[difference between the two models\]
 
 The presence-absence model converged very quickly and gave coefficient estimates that seemed more reasonably constrained. However, the variation in the predicted intensities were clearly higher within Trøndelag county than for the rest of Norway, likely reflecting the regional bias in the dataset.
 
-All in all, we argue that this report presents a simple and reproducible workflow demonstrating the potential of using "raw" GBIF data in combination with high-quality, structured datasets (either from GBIF or outside) in an integrated SDM framework.
+Finally, the integrated model both seemed to give more "reasonable values" for the predicted intensities than the two presence-only models, as well as a higher coverage of Norway than the presence-absence model.
+
+## Conclusion
+
+All in all, we argue that this report presents a simple and reproducible workflow demonstrating the potential of using "raw" GBIF data in combination with high-quality, structured data sets (either from GBIF or outside) in an integrated SDM framework.
 
 Overall, our preliminary results suggest that integration of the two dataset types result in model predictions that better align with expected distributions, and seem to balance high-quality localized data with presence-only data from a larger area.
 
 # Bibliography
 
+## Literature
+
 ::: {#refs}
 :::
 
-Manual reference list
-
--   Alp, M., Keller, I., Westram, A. M., & Robinson, C. T. (2012). How river structure and biological traits influence gene flow: a population genetic study of two stream invertebrates with differing dispersal abilities. *Freshwater Biology*, *57*(5), 969--981. https://doi.org/10.1111/j.1365-2427.2012.02758.x
-
--   Artsdatabanken (2021). **Vanlig smådøgnflue *Baetis rhodani* (Pictet, 1843-45).** Retrieved 13.05.2024. <https://artsdatabanken.no/Taxon/Baetis%20rhodani/49481>
-
--   Bagge, P. (1995). Emergence and upstream flight of lotic mayflies and caddisflies (Ephemeroptera and Trichoptera) in a lake outlet, central Finland. *Entomologica Fennica*, *6*(2-3), 91--97. https://doi.org/10.33338/ef.83844
-
--   European Environment Agency (EEA) (2018). *CORINE Land Cover 2018 (CLC2018), Version 20_2018, European Environment Agency.* Retrieved from https://land.copernicus.eu/pan-european/corine-land-cover
-
--   GBIF.org (2024), GBIF Home Page. Available from: [https://www.gbif.or](https://www.gbif.org/)g.
-
--   Mostert, P. S., & O'Hara, R. B. (2023). PointedSDMs: An R package to help facilitate the construction of integrated species distribution models. *Methods in Ecology and Evolution*, 14, 1200--1207. <https://doi.org/10.1111/2041-210X.14091>
-
--   NVE (2020, October 7). Elvenettverk/ELVIS. Retrieved from: <https://www.nve.no/kart/kartdata/vassdragsdata/elvenettverk-elvis/>
-
--   Peredo Arce, A., Hörren, T., Schletterer, M., & Kail, J. (2021). How far can EPTs fly? A comparison of empirical flying distances of riverine invertebrates and existing dispersal metrics. *Ecological Indicators*, *125*, 107465. https://doi.org/10.1016/j.ecolind.2021.107465
-
-Citing R and packages used, including package version.
+## R resources
 
 ```{r}
 # Citing all packages used, including the package versions.

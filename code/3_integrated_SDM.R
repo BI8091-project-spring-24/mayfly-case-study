@@ -98,22 +98,22 @@ covars <- c(bio10_scaled, bio11_scaled)
 # Specify models -- here we run a model with one spatial covariate and a shared spatial field
 
 # all data as presence-only
-model_po_full <- intModel(presence_only_full, spatialCovariates = bio10_scaled, 
+model_po_full <- intModel(presence_only_full, spatialCovariates = c(bio10_scaled, bio11_scaled), 
                   Coordinates = c('X', 'Y'),
                   Projection = projection, Mesh = Mesh, responsePA = 'Present')
 
 # only presence-only not from VM
-model_po_partial <- intModel(presence_only_no_vm, spatialCovariates = bio10_scaled, 
+model_po_partial <- intModel(presence_only_no_vm, spatialCovariates = c(bio10_scaled, bio11_scaled),
                   Coordinates = c('X', 'Y'),
                   Projection = projection, Mesh = Mesh, responsePA = 'Present')
 
 # only presence-absence from VM
-model_pa_only <- intModel(presence_absence, spatialCovariates = bio10_scaled, 
+model_pa_only <- intModel(presence_absence, spatialCovariates = c(bio10_scaled, bio11_scaled),
                              Coordinates = c('X', 'Y'),
                              Projection = projection, Mesh = Mesh, responsePA = 'Present')
 
 # integrated model
-model_integrated <- intModel(b_rhodani, spatialCovariates = bio10_scaled, 
+model_integrated <- intModel(b_rhodani, spatialCovariates = c(bio10_scaled, bio11_scaled),
                              Coordinates = c('X', 'Y'),
                              Projection = projection, Mesh = Mesh, responsePA = 'Present')
 
