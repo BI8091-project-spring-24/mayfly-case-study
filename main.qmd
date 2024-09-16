@@ -33,13 +33,13 @@ The aim of the project is to investigate how species distribution models can be 
 
 ### Study organism
 
-The case study will focus on the mayfly species *Baetis rhodani* , also called the Large Dark Olive Mayfly. Nymphs of *B. rhodani* is commonly found in running waters all over Norway (Artsdatabanken, 2021) and can also be found in most of Western-Europe. *B. rhodani* adults are winged and inhabit the terrestrial habitat for a limited time in order to reproduce. They cannot feed in their adult stage, so their life on land is short - typically lasting a few days. Not many studies have measured the dispersal distance of adult Mayflies. A study from 2021 aggregating flying distances for EPTs (Peredo Arce et al., 2021) cite only one study for *B. rhodani*, which had measured adults flying more than 3700 meters (Bagge, 1995).
+The case study will focus on the mayfly species *Baetis rhodani*, also called the Large Dark Olive Mayfly. Nymphs of *B. rhodani* is commonly found in running waters all over Norway (Artsdatabanken, 2021) and can also be found in most of Western Europe. *B. rhodani* adults are winged and inhabit the terrestrial habitat for a limited time in order to reproduce. They cannot feed in their adult stage, so their life on land is short - typically lasting a few days. Not many studies have measured the dispersal distance of adult Mayflies. A study from 2021 aggregating flying distances for EPTs (Peredo Arce et al., 2021) cite only one study for *B. rhodani*, which had measured adults flying more than 3700 meters (Bagge, 1995).
 
-We assume that most of the *B. rhodani* datapoints from Norway originate from aquatic sampling, which for some datasets can be verified (ie., the NTNU University Museum).
+We assume that most of the *B. rhodani* datapoints from Norway originate from aquatic sampling, which for some datasets can be verified (i.e. in the case of the NTNU University Museum).
 
 ### Data
 
-Mayfly data is accessed through the Global Biodiversity Information Facility (GBIF, 2024). Norway is selected as study area, due to the availability of both high-quality species occurrence data (NTNU University Museum) and presence-only data from national monitoring and research. Easily accessible physical, climatic and geographical data also makes Norway a good case-study.
+Mayfly data is accessed through the Global Biodiversity Information Facility (GBIF, 2024). Norway is selected as study area, due to the availability of both high-quality species occurrence data (NTNU University Museum) and presence-only data from national monitoring and research. Easily accessible physical, climatic and geographical data also makes Norway a good case study.
 
 # Workflow
 
@@ -227,7 +227,7 @@ ggplot() +
 
 We used the Worldclim bioclimatic variables to map the distribution of *B. rhodani.* Specifically, we used bioclim10 (Mean Temperature of The Warmest Quarter) and bioclim11 (Mean Temperature of The Coldest Quarter) at a 30 arc second resolution (\~ 1km\^2). Below, we plotted the distribution of the bio10 and bio11 values across Norway. These particular variables were chosen due to their assumed impact on water temperature, as water temperature is known to be important for *B. rhodani* development. Preliminary analysis revealed a significant but moderate correlation value between the two climate variables (r = 0.559, t(877822) = 631, p \< 0.001). Therefore, the two variables were used in the SDMs.
 
-In this report, we chose to include WORLDCLIM 10 and 11 as predictor variables to our iSDM. In order to predict the distribution of *Baetis rhodani*, it could also be of interest to include land-cover data (i.e, CORINE land cover data, ref) or distance to rivers (i.e., created using the river network dataset provided by NVE, ref).
+In this report, we chose to include WORLDCLIM 10 and 11 as predictor variables to our iSDM. In order to predict the distribution of *Baetis rhodani*, it could also be of interest to include land cover data (i.e, CORINE land cover data, ref) or distance to rivers (i.e. using the river network dataset provided by NVE, ref). More details on the procedure are detailed in the script `2_WORLDCLIM_environmental_variables.R`.
 
 ```{r plot worldclim}
 #| label: fig-worldclim
@@ -267,11 +267,13 @@ plot_grid(bio10_plot, bio11_plot)
 
 We set up the `INLA` raster to be used in the `pointedSDM` model according to the recommendations provided at (Mostert & O'Hara, 2023). Mesh coarseness was adjusted in order to balance performance and accuracy given the amount and spread of the data provided. All environmental variables were centered and scaled to mean zero and unit variance, and four different models were specified, according to the study questions outlined above.
 
-For more details on model set up and mesh adjustment, see the script `5_integrated_SDM.R`.
+For more details on model set up and mesh adjustment, see the script `3_integrated_SDM.R`.
 
 # Results
 
-Predictions of the likelihood of occurrence of B. rhodani were created for each of the four models, as seen in @fig-predictions.
+Key parameters of the fitted models are shown in table(REF)
+
+Prediction maps of the intensity of *B. rhodani* occurence were created for Norway based on each of the four models, as seen in @fig-predictions.
 
 ```{r SDMs}
 #| eval: true
@@ -316,7 +318,15 @@ modelRun_integrated$summary.hyperpar
 
 # Model interpretation and discussion
 
+Due to the fact that all models were fitted to different datasets, direct comparison of model likelihood and goodness-of-fit metrics such as AIC and BIC were not possible.
 
+However, as seen in @fig-predictions, it's clear that the two presence-only models give a much higher range of predicted intensities and coefficient estimates for the effect of the bioclimatic variables. This might be indicative of poor model fit, which warning of model divergence given by the fitISDM() function also support. \[difference between the two models\]
+
+The presence-absence model converged very quickly and gave coefficient estimates that seemed more reasonably constrained. However, the variation in the predicted intensities were clearly higher within Trøndelag county than for the rest of Norway, likely reflecting the regional bias in the dataset.
+
+All in all, we argue that this report presents a simple and reproducible workflow demonstrating the potential of using "raw" GBIF data in combination with high-quality, structured datasets (either from GBIF or outside) in an integrated SDM framework.
+
+Overall, our preliminary results suggest that integration of the two dataset types result in model predictions that better align with expected distributions, and seem to balance high-quality localized data with presence-only data from a larger area.
 
 # Bibliography
 
