@@ -1,5 +1,6 @@
 ---
 title: "A protocol for GBIF data exploration and filtering for Integrated Species Distribution Models - with a practical example"
+bibliography: bibliography.bib
 format: html
 editor: visual
 ---
@@ -317,9 +318,12 @@ modelRun_integrated$summary.hyperpar
 
 # Model interpretation and discussion
 
-# Citations
+# Bibliography
 
-## Literature references
+::: {#refs}
+:::
+
+/li
 
 Manual reference list
 
