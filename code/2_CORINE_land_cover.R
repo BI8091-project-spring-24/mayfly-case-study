@@ -39,7 +39,7 @@ crs(norway_corine_projection, proj = TRUE) #"+proj=laea +lat_0=52 +lon_0=10 +x_0
 
 ## 2.3. Crop and mask CORINE 2018 to Norway ------------------------------------
 norway_corine_2018 <- terra::crop(corine_2018, norway_corine_projection,
-                            mask = TRUE, overwrite = TRUE)
+                                  mask = TRUE, overwrite = TRUE)
 
 ## 2.4. Save cropped layer -----------------------------------------------------
 terra::writeRaster(norway_corine_2018,
@@ -53,7 +53,7 @@ terra::writeRaster(norway_corine_2018,
 # The CORINE 2018 Land Cover Status Layer values will be aggregated to only maintain the values relevant for the analysis
 
 # Urban Fabric
-  # all the urban classes are pooled together, due to their sparse distribution across Norway
+# all the urban classes are pooled together, due to their sparse distribution across Norway
 norway_corine_modified <- app(norway_corine_2018,
                               fun = function(x){x[x %in% c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)] <- 1; 
                               return(x)})
@@ -104,7 +104,7 @@ terra::writeRaster(norway_corine_modified,
                    overwrite = TRUE)
 
 ## 3.2.Plot map of land cover classes ------------------------------------------
-  
+
 # Convert raster to df
 corine_modified_df <- as.data.frame(norway_corine_modified, xy = TRUE)
 
@@ -176,7 +176,7 @@ formatted_values <- apply(counts_matrix, 1, format_counts)
 # Create a new raster to store the formatted values
 result_raster <- rast(nrows = nrow(agg_raster), ncols = ncol(agg_raster), 
                       ext = ext(agg_raster), vals = formatted_values)
- 
+
 # Print the aggregated raster values
 result_matrix <- matrix(values(result_raster), nrow = nrow(result_raster), byrow = TRUE)
 print(result_matrix)
