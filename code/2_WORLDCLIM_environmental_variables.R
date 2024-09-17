@@ -43,8 +43,8 @@ terra::writeRaster(bio11_norway,
 # Check correlations -----------------------------------------------------------
 
 # Convert rasters to dfs
-bio10_norway <- as.data.frame(bio10_norway, xy = TRUE)
-bio11_norway <- as.data.frame(bio11_norway, xy = TRUE)
+bio10_norway_df <- as.data.frame(bio10_norway, xy = TRUE)
+bio11_norway_df <- as.data.frame(bio11_norway, xy = TRUE)
 
 # Run correlation test
 cor.test(bio10_norway_df$wc2.1_30s_bio_10, bio11_norway_df$wc2.1_30s_bio_11)
