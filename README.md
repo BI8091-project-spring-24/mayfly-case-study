@@ -10,7 +10,7 @@ The present study aims to answer the following study questions:
 
 1.  Can unstructured GBIF occurrence records of *B. rhodani* be used in combination with data originating from structured sampling programs to map the distribution of *B. rhodani* across Norway?
 2.  Do Species Distribution Models (SDMs) using both types of data perform better to map the distribution of the species than single-data source SDMs?
-3.  What is the distribution of *B. rhodani* across Norway, when mean temperature of the warmest quarter and land cover are considered?
+3.  What is the distribution of *B. rhodani* across Norway, when mean temperature of the warmest quarter and mean temperature of the coldest quarter are considered?
 
 ![](http://www.rakkenes.com/wp-content/uploads/2017/06/0F5R8264-Edit-Edit-1030x579.jpg){width="555"}
 
@@ -24,12 +24,10 @@ The data used in this project are:
     1.  Structured dataset: the Freshwater benthic invertebrates ecological collection NTNU University Museum was used to create a presence-absence dataset
     2.  Unstructured dataset: all occurrences of *B. rhodani* in Norwayfrom 1950 to the present day
 2.  Bioclimatic variables were downloaded from <https://worldclim.org/>
-3.  CORINE Land Cover Status rasters were downloaded from <https://land.copernicus.eu/en/products/corine-land-cover>
-4.  NVE River Network was downloaded from <https://www.nve.no/vann-og-vassdrag/hydrologiske-data/>
 
 The distribution of *B. rhodani* was mapped using the R package "PointedSDMs" ([https://github.com/PhilipMostert/PointedSDMs](#0)).
 
-All the data used as part of the analysis is accessible via download links, either directly from the data providers when possible (for both GBIF datasets and the WORLDCLIM Bioclimatic variables) or from stable data repositories (CORINE Land Cover Status rasters, NVE River Network).
+All the data used as part of the analysis is accessible via download links.
 
 ## Script Structure
 
@@ -47,10 +45,8 @@ The analysis executed as part of this project is divided into separate scripts, 
 
 -   1_5_GBIF_presence_absence_dataset = Download of the Freshwater benthic invertebrates ecological collection NTNU University Museum (structured dataset) and creation of the presence-absence matrix required for the PointedSDM
 
--   2_CORINE_land_cover = Download of CORINE 2018 Land Cover Status, cropping and masking to Norway and modification of classes included to better suit our analysis
+-   2_WORLDCLIM_environmental_variables = Downloading, cropping and masking of Worldclim bioclimatic variables to Norway
 
--   3_NVE_distance_to_river = Download of the network of main rivers in Norway and calculation of the distance to river for each CORINE cell
+-   3_integrated_SDM = Running of the integrated SDM
 
--   4_WORLDCLIM_environmental_variables_prep = Download, cropping and masking of Worldclim bioclimatic variables to Norway
-
--   5_integrated_SDM = Running of the integrated SDM
+**N.B!** In order to successfully run through the scripts in this analysis, you [**must**]{.underline} set up your own GBIF credentials [**before**]{.underline} starting the analysis.
