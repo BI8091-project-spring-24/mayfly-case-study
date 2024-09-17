@@ -14,7 +14,7 @@ bru_options_set(inla.mode = "experimental")
 
 # Load occurrences data
 load(here("data", "derived_data", "cleaned_insectdata.rda"))
-load(here("data", "derived_data", "presence_absence_dataset.rda"))
+load(here("data", "derived_data", "presence_absence_dataset.Rda"))
 
 # Define projection
 projection <- "+proj=longlat +ellps=WGS84"
