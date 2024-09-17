@@ -1,6 +1,7 @@
 ---
 title: "A protocol for GBIF data exploration and filtering for Integrated Species Distribution Models - with a practical example"
-bibliography: bibliography.bib
+bibliography: [bibliography.bib, packages.bib]
+date: today
 author: 
   - "Hanne Bjørnås Krogstie"
   - "Audun Rugstad"
@@ -8,10 +9,6 @@ author:
 warning: false
 format:
   pdf:
-    documentclass: article
-    header-includes:
-      - \usepackage{ragged2e}
-      - \RaggedRight
     fig-pos: "H"
 editor: visual
 ---
@@ -243,7 +240,7 @@ ggplot() +
 
 We used the Worldclim bioclimatic variables to map the distribution of *B. rhodani.* Specifically, we used bioclim10 (Mean Temperature of The Warmest Quarter) and bioclim11 (Mean Temperature of The Coldest Quarter) at a 30 arc second resolution (\~ 1km\^2). Below, we plotted the distribution of the bio10 and bio11 values across Norway. These particular variables were chosen due to their assumed impact on water temperature, as water temperature is known to be important for *B. rhodani* development. Preliminary analysis revealed a significant but moderate correlation value between the two climate variables (r = 0.559, t(877822) = 631, p \< 0.001). Therefore, the two variables were used in the SDMs.
 
-In this report, we chose to include WORLDCLIM 10 and 11 as predictor variables to our iSDM. In order to predict the distribution of *Baetis rhodani*, it could also be of interest to include land cover data (i.e, CORINE land cover data, @european_environment_agency_eea_corine_2018) or distance to rivers (i.e. using the river network dataset provided by NVE, @nve2020). More details on the procedure are detailed in the script `2_WORLDCLIM_environmental_variables.R`.
+In this report, we chose to include WORLDCLIM 10 and 11 as predictor variables to our iSDM. In order to predict the distribution of *Baetis rhodani*, it could also be of interest to include land cover data (i.e, CORINE land cover data, @european_environment_agency_eea_corine_2018) or distance to rivers (i.e. using the river network dataset provided by NVE, @nve_elvenettverk_2020). More details on the procedure are detailed in the script `2_WORLDCLIM_environmental_variables.R`.
 
 ```{r plot worldclim}
 #| label: fig-worldclim
@@ -365,19 +362,12 @@ All in all, we argue that this report presents a simple and reproducible workflo
 
 Overall, our preliminary results suggest that integration of the two dataset types result in model predictions that better align with expected distributions, and seem to balance high-quality localized data with presence-only data from a larger area.
 
-# Bibliography
+# References [incl. R packages]
 
-## Literature
+---
+nocite: |
+  @*
+---
 
 ::: {#refs}
 :::
-
-## R resources
-
-```{r}
-#| echo: false
-#| code-overflow: wrap
-options(width = 20)
-# Citing all packages used, including the package versions.
-report::cite_packages()
-```

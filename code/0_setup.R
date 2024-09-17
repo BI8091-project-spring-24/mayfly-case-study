@@ -20,8 +20,7 @@ package_vec <- c("here","dplyr","knitr",
                  "PointedSDMs","stringr",
                  "stars", "geodata", 
                  "ggspatial", "cowplot",
-                 "tidyterra", "giscoR",
-                 "listings")
+                 "tidyterra", "giscoR")
 
 ## Executing install & load for each package
 sapply(package_vec, install.load.package)
