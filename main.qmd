@@ -287,9 +287,7 @@ For more details on model set up and mesh adjustment, see the script `3_integrat
 
 # Results
 
-Key parameters of the fitted models are shown in table(REF)
-
-Prediction maps of the intensity of *B. rhodani* occurence were created for Norway based on each of the four models, as seen in @fig-predictions.
+Prediction maps of the intensity of *B. rhodani* occurence were created for Norway based on each of the four models, as seen in @fig-predictions, with key parameters of the fitted models shown below.
 
 ```{r SDMs}
 #| eval: true
@@ -340,7 +338,7 @@ modelRun_integrated$summary.hyperpar
 
 Due to the fact that all models were fitted to different data sets, direct comparison of model likelihood and goodness-of-fit metrics such as AIC and BIC were not possible.
 
-However, as seen in @fig-predictions, it's clear that the two presence-only models give a much higher range of predicted intensities and coefficient estimates for the effect of the bioclimatic variables. This might be indicative of poor model fit, which warning of model divergence given by the fitISDM() function also support. \[difference between the two models\]
+However, as seen in @fig-predictions, it's clear that the two presence-only models give a much higher range of predicted intensities and coefficient estimates for the effect of the bioclimatic variables. This might be indicative of poor model fit, which warning of model divergence given by the `fitISDM()` function also support.
 
 The presence-absence model converged very quickly and gave coefficient estimates that seemed more reasonably constrained. However, the variation in the predicted intensities were clearly higher within Trøndelag county than for the rest of Norway, likely reflecting the regional bias in the dataset.
 
@@ -362,7 +360,7 @@ All in all, we argue that this report presents a simple and reproducible workflo
 
 Overall, our preliminary results suggest that integration of the two dataset types result in model predictions that better align with expected distributions, and seem to balance high-quality localized data with presence-only data from a larger area.
 
-# References [incl. R packages]
+# References \[incl. R packages\]
 
 ---
 nocite: |
